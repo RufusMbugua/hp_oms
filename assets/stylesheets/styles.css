@@ -27985,27 +27985,39 @@ body {
 #sidebar .item, #sidebar .label {
   font-size: 14px !important;
 }
-
+/* line 55, ../sass/styles.scss */
+#sidebar .active {
+  color: #0096d6 !important;
+}
 /* line 57, ../sass/styles.scss */
+#sidebar .active .label {
+  background: #0096d6 !important;
+}
+
+/* line 63, ../sass/styles.scss */
 #main_menu {
   background: #0096d6;
   border-radius: 0;
 }
-/* line 60, ../sass/styles.scss */
+/* line 66, ../sass/styles.scss */
+#main_menu .brand {
+  font-weight: bold;
+}
+/* line 69, ../sass/styles.scss */
 #main_menu .active.item {
   background: #767676;
 }
-/* line 63, ../sass/styles.scss */
+/* line 72, ../sass/styles.scss */
 #main_menu .item {
   color: white;
   font-size: 14px !important;
 }
 
-/* line 74, ../sass/styles.scss */
+/* line 83, ../sass/styles.scss */
 .tile {
   border-radius: 3px;
 }
-/* line 76, ../sass/styles.scss */
+/* line 85, ../sass/styles.scss */
 .tile .title {
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
@@ -28014,7 +28026,7 @@ body {
   background: #0096d6;
   color: white;
 }
-/* line 86, ../sass/styles.scss */
+/* line 95, ../sass/styles.scss */
 .tile .outer {
   background-color: #fff;
   box-shadow: 0px 1px 5px 0px #d3d3d3;
@@ -28024,7 +28036,7 @@ body {
   border-bottom-right-radius: 3px;
   margin-bottom: 20px;
 }
-/* line 88, ../sass/styles.scss */
+/* line 97, ../sass/styles.scss */
 .tile .outer .inner {
   overflow-y: auto;
   height: 30%;
@@ -28038,19 +28050,19 @@ body {
   overflow-y: auto;
 }
 
-/* line 102, ../sass/styles.scss */
+/* line 111, ../sass/styles.scss */
 .mini.tile .inner {
   height: 15%;
 }
 
-/* line 108, ../sass/styles.scss */
+/* line 117, ../sass/styles.scss */
 .small.tile .title {
   background: transparent;
   text-align: center;
   margin-bottom: 0;
   color: #666;
 }
-/* line 116, ../sass/styles.scss */
+/* line 125, ../sass/styles.scss */
 .small.tile .outer .inner {
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;

@@ -52,11 +52,20 @@ body{
     .item,.label{
         font-size:14px !important;
     }
+    .active{
+        color:$hp_blue !important;
+        .label{
+           background:$hp_blue !important; 
+        }
+    }
 
 }
 #main_menu{
     background:$hp_blue;
     border-radius:0;
+    .brand{
+        font-weight:bold;
+    }
     .active.item{
 background:$hp_grey;
     }

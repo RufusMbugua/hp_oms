@@ -1,7 +1,7 @@
 <div class="ui vertical menu" id="sidebar">
- <a class="active red item">
+ <a class="active item">
     Issues
-    <div class="ui red label">1</div>
+    <div class="ui label">1</div>
   </a>
   <a class="item">
     Tasks
