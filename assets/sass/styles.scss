@@ -1,0 +1,124 @@
+// customize bootstrap variables here:
+@import "variables";
+@import "bootstrap";
+@import "../bower_components/fontawesome/scss/font-awesome";
+@import "../bower_components/typeplate-starter-kit/scss/_typeplate";
+@import "CSS:../bower_components/webfont-opensans/stylesheet";
+@import "CSS:../bower_components/semantic-ui/build/packaged/css/semantic.min";
+$hp_blue:#0096D6;
+$hp_grey:#767676;
+//Mixins
+@mixin tile{
+    background-color: #fff;
+    box-shadow: 0px 1px 5px 0px #d3d3d3;
+    margin-bottom: 5px;
+    font-size: 0.8em !important;
+ border-bottom-left-radius:3px;
+    border-bottom-right-radius:3px;
+    margin-bottom:20px;
+
+}
+@mixin inner-style($height){
+    overflow-y: auto;
+    height:$height;
+    padding:0 1.5% 2% 1.5%;
+
+    form, ul {
+    width: 100%;
+    height: 90%;
+    padding: 0 1.5% 0 1.5%;
+    overflow-y: auto;
+    @extend .epsilon;
+   
+}
+}
+body{
+    background:#f1f2f7;
+    font-size:10px !important;
+    padding:0;
+    font-family: OpenSansRegular !important;
+}
+
+// Styles
+#content_view{
+    margin-top:5px;
+    @extend .row;
+}
+#sidebar{
+    padding:0px;
+    font-size:10px;
+    height:100%;
+    border-top:none;
+    .item,.label{
+        font-size:14px !important;
+    }
+
+}
+#main_menu{
+    background:$hp_blue;
+    border-radius:0;
+    .active.item{
+background:$hp_grey;
+    }
+    .item{
+        color:white;
+        font-size:14px !important;
+    }
+}
+#side{
+    @extend .col-md-3;
+}
+#main{
+    @extend .col-md-9;
+}
+.tile{
+    border-radius:3px;
+    .title{
+        border-top-left-radius:3px;
+    border-top-right-radius:3px;
+        padding:2px 6px;
+        margin-bottom:0;
+            @extend .delta;
+             background:$hp_blue;
+             color:white;
+            // background:#d9d9d9;
+        }
+    .outer{
+@include tile;
+        .inner{
+@include inner-style(30%);
+    }
+    }
+    
+}
+.large.tile{
+    @extend .col-md-12;
+}
+.medium.tile{
+    @extend .col-md-6;
+}
+.mini.tile{
+    @extend .col-md-3;
+    .inner{
+        height:15%;
+    }
+}
+.small.tile{
+    @extend .col-md-3;
+    .title{
+        background:transparent;
+        text-align:center;
+        margin-bottom:0;
+        color:#666;
+        @extend .epsilon;
+    }
+    .outer{
+    .inner{
+        border-top-left-radius:3px;
+    border-top-right-radius:3px;
+padding:0;
+       
+}
+    }
+    
+}
