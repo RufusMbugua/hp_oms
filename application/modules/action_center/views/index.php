@@ -46,6 +46,8 @@
 </div>
 <div class="mini tile">
 	<div class="outer">
-		<div class="inner">mini</div>
+		<div class="inner">
+			<i class="circular fa fa-git"></i>
+		</div>
 	</div>
 </div>

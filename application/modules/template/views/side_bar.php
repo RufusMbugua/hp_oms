@@ -11,7 +11,10 @@
     Teams
     <div class="ui label">51</div>
   </a>
- 
+ <a class="item">
+    Events
+    <div class="ui label">2</div>
+  </a>
   <div class="item">
     <div class="ui small icon input">
       <input type="text" placeholder="Search mail...">
