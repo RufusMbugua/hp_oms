@@ -12,7 +12,8 @@ class email extends MY_Controller {
 
 
 	public function __construct(){
-
+		parent::__construct();
+		
 		$this->load->config("email");
 
 		$this->imap_server 		=		$this->config->item("imap_server");
@@ -21,7 +22,7 @@ class email extends MY_Controller {
 		$this->smtp_config 		=		$this->config->item("smtp_config");
 
 		$this->load->model('email_model');
-		$this->load->library('Imap');
+		//$this->load->library('Imap');
 	}
 
 
@@ -76,5 +77,9 @@ class email extends MY_Controller {
 		}
 		
 
+	}
+
+	public function test(){
+		$this->send("mwangikevinn@gmail.com","Test","This is just a test",NULL,"HP OMS");
 	}
 }
