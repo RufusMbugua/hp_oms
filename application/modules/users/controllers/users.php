@@ -1,56 +1,105 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Manage extends MY_Controller {
+class Users extends MY_Controller {
 
 	public function __construct(){
 		parent::__construct();
-		$this->load->model('manage_m');
+
+/*		
+		if(($this->uri->segment(2) !== 'login' || $this->uri->segment(2) !== 'logout') && !$this->ion_auth->logged_in()){
+			// One should be logged in to access this page
+		}
+*/
+
+		$this->load->model('users_m');
 
 		$this->load->library('ion_auth');
 
 		$this->load->library('form_validation');
 		$this->form_validation->set_error_delimiters('<p class="text-danger">', '</p>');
+
+		$this->load->helper('form_helper');
 	}
 
 	public function index(){
 		// Show users dashboard. From here, all manage functionalities are triggered
     }
 
+	public function login(){
+		$this->form_validation->set_rules('email_address', 'Email', 'trim|required|valid_email');
+		$this->form_validation->set_rules('account_password', 'Password', 'trim|required');
+
+		if(!$this->input->post('login_btn') || $this->form_validation->run() == false){
+	        $data['contentView'] = 'users/login_form';
+	        $data['title'] = 'Access Account';
+	        $this->template($data);
+		}else{
+			die('Login processing....');
+			$email = $this->input->post('email_address');
+			$password = $this->input->post('account_password');
+
+			$login_user = $this->ion_auth->login($email, $password);
+			if($login_user){
+				// Redirect to particular page?
+			}else{
+				$login_errors = $this->ion_auth->errors();
+				$this->session->set_flashdata('login_response', $login_errors);
+				redirect('users/login', 'refresh');
+			}
+		}
+    }
+
 	public function create_group(){
 		$this->form_validation->set_rules('group_name', 'Name', 'trim|required');
 		$this->form_validation->set_rules('group_description', 'Description', 'trim|required');
-		if(!$this->input->post('create_group_btn') && $this->form_validation->run() == false){
-			// Show the form
+
+		if(!$this->input->post('create_group_btn') || $this->form_validation->run() == false){
+	        $data['contentView'] = 'users/create_group_form';
+	        $data['title'] = 'Create Group';
+	        $this->template($data);
 		}else{
 			$group_name = $this->input->post('group_name');
 			$group_description = $this->input->post('group_description');
 
 			$create_group = $this->ion_auth->create_group($group_name, $group_description);
 			if($create_group){
-				$new_group = $this->ion_auth->group($create_group)->result();
-				// Return group information
+				$this->session->set_flashdata('create_group_response', '<div class="alert alert-success">Group Created</div>');
+				redirect('users/create_group', 'refresh');
 			}else{
-				$create_group_errors = $this->ion_auth->errors_array();
-				// Return the errors
+				$create_group_errors = $this->ion_auth->errors();
+				$this->session->set_flashdata('create_group_response', $create_group_errors);
+				redirect('users/create_group', 'refresh');
 			}
 		}
 	}
 
-	public function update_group($group_id){
-		$this->form_validation->set_rules('group_name', 'Name', 'trim|required');
-		$this->form_validation->set_rules('group_description', 'Description', 'trim|required');
-		if(!$this->input->post('update_group_btn') && $this->form_validation->run() == false){
-			// Show the form
+	public function update_group($group_id=false){
+		if($group_id === false){
+			show_error('The group ID required to update group!');
 		}else{
-			$group_name = $this->input->post('group_name');
-			$group_description = $this->input->post('group_description');
+			$group_info = $this->ion_auth->group($group_id)->result();
 
-			$update_group = $this->ion_auth->update_group($group_id, $group_name, $group_description);
-			if($update_group){
-				// Return confirmation
+			$this->form_validation->set_rules('group_name', 'Name', 'trim|required');
+			$this->form_validation->set_rules('group_description', 'Description', 'trim|required');
+
+			if(!$this->input->post('update_group_btn') || $this->form_validation->run() == false){
+		        $data['contentView'] = 'users/update_group_form';
+		        $data['title'] = 'Update Group';
+		        $data['group_info'] = $group_info;
+		        $this->template($data);
 			}else{
-				$update_group_errors = $this->ion_auth->errors_array();
-				// Return the errors
+				$group_name = $this->input->post('group_name');
+				$group_description = $this->input->post('group_description');
+
+				$update_group = $this->ion_auth->update_group($group_id, $group_name, $group_description);
+				if($update_group){
+					$this->session->set_flashdata('update_group_response', '<div class="alert alert-success">Group Updated</div>');
+					redirect('users/update_group/'.$group_id, 'refresh');
+				}else{
+					$update_group_errors = $this->ion_auth->errors();
+					$this->session->set_flashdata('update_group_response', $update_group_errors);
+					redirect('users/update_group/'.$group_id, 'refresh');
+				}
 			}
 		}
 	}
@@ -59,12 +108,14 @@ class Manage extends MY_Controller {
 		$this->form_validation->set_rules('surname', 'Surname', 'trim|required');
 		$this->form_validation->set_rules('other_names', 'Other Names', 'trim|required');
 		$this->form_validation->set_rules('gender', 'Gender', 'required');
-		$this->form_validation->set_rules('sub_county', 'Sub County', 'required');
 		$this->form_validation->set_rules('birthday', 'Birthday', 'required');
+		$this->form_validation->set_rules('sub_county', 'Sub County', 'required');
 		$this->form_validation->set_rules('phone', 'Phone', 'trim}required|is_numeric|exact_length[12]|is_unique[users.phone]');
 		$this->form_validation->set_rules('email_address', 'Email', 'trim|required|valid_email|is_unique[users.email]');
-		if(!$this->input->post('create_user_btn') && $this->form_validation->run() == false){
-			// Show the form
+		if(!$this->input->post('create_user_btn') || $this->form_validation->run() == false){
+	        $data['contentView'] = 'users/create_user_form';
+	        $data['title'] = 'Create Group';
+	        $this->template($data);
 		}else{
 			$username = 'user_';
 			$password = hash('sha256', uniqid(rand().time(), true));
@@ -89,14 +140,14 @@ class Manage extends MY_Controller {
 					if($activate_user){
 						// Return confirmation/user information $new_user
 					}else{
-						$activate_user_errors = $this->ion_auth->errors_array();
+						$activate_user_errors = $this->ion_auth->errors();
 						// Return the errors
 					}
 				}else{
 				// Return confirmation
 				}
 			}else{
-				$create_user_errors = $this->ion_auth->errors_array();
+				$create_user_errors = $this->ion_auth->errors();
 				// Return the errors
 			}
 		}
@@ -110,7 +161,7 @@ class Manage extends MY_Controller {
 					if($activate_user){
 						// Return confirmation
 					}else{
-						$activate_user_errors = $this->ion_auth->errors_array();
+						$activate_user_errors = $this->ion_auth->errors();
 						// Return the errors
 					}
 				}else{
@@ -124,7 +175,7 @@ class Manage extends MY_Controller {
 					if($deactivate_user){
 						// Return confirmation
 					}else{
-						$deactivate_user_errors = $this->ion_auth->errors_array();
+						$deactivate_user_errors = $this->ion_auth->errors();
 						// Return the errors
 					}
 				}else{
@@ -172,7 +223,7 @@ class Manage extends MY_Controller {
 			if($update_user){
 				// Return confirmation
 			}else{
-				$update_user_errors = $this->ion_auth->errors_array();
+				$update_user_errors = $this->ion_auth->errors();
 				// Return the errors
 			}
 		}
@@ -188,7 +239,7 @@ class Manage extends MY_Controller {
 		if(!$this->input->post('assign_user_btn') && $this->form_validation->run() == false){
 			// Show the form
 		}else{
-			$assign_user = $this->manage_m->assign_user_to_project($user_id);
+			$assign_user = $this->users_m->assign_user_to_project($user_id);
 			if($assign_user){
 				// Return confirmation
 			}else{
@@ -202,7 +253,7 @@ class Manage extends MY_Controller {
 		if(is_object($user)){
 			// Return the user information
 		}else{
-			$user_errors = $this->ion_auth->errors_array();
+			$user_errors = $this->ion_auth->errors();
 			// Return the errors
 		}
 	}
@@ -232,11 +283,11 @@ class Manage extends MY_Controller {
 						if($promote_user){
 							// Return confirmation
 						}else{
-							$promote_user_errors = $this->ion_auth->errors_array();
+							$promote_user_errors = $this->ion_auth->errors();
 							// Return the errors
 						}
 					}else{
-						$maintenance_errors = $this->ion_auth->errors_array();
+						$maintenance_errors = $this->ion_auth->errors();
 						// Return the errors
 					}
 				}else{
@@ -252,11 +303,11 @@ class Manage extends MY_Controller {
 						if($demote_user){
 							// Return confirmation
 						}else{
-							$demote_user_errors = $this->ion_auth->errors_array();
+							$demote_user_errors = $this->ion_auth->errors();
 							// Return the errors
 						}
 					}else{
-						$maintenance_errors = $this->ion_auth->errors_array();
+						$maintenance_errors = $this->ion_auth->errors();
 						// Return the errors
 					}
 				}else{
@@ -270,8 +321,8 @@ class Manage extends MY_Controller {
 		}
 	}
 
-    public function template($data){
-    	// Show the various views
+    public function template($data) {
+        $this->load->module('template');
+        $this->template->index($data);
     }
-
 }

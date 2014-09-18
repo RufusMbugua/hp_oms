@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Manage_m extends CI_Model {
+class Users_m extends CI_Model {
 
 	function assign_user_to_project($user_id){
 		$data = array(
