@@ -110,11 +110,11 @@ class Users extends MY_Controller {
 		$this->form_validation->set_rules('gender', 'Gender', 'required');
 		$this->form_validation->set_rules('birthday', 'Birthday', 'required');
 		$this->form_validation->set_rules('sub_county', 'Sub County', 'required');
-		$this->form_validation->set_rules('phone', 'Phone', 'trim}required|is_numeric|exact_length[12]|is_unique[users.phone]');
+		$this->form_validation->set_rules('phone', 'Phone', 'trim}required|is_numeric|exact_length[10]|is_unique[users.phone]');
 		$this->form_validation->set_rules('email_address', 'Email', 'trim|required|valid_email|is_unique[users.email]');
 		if(!$this->input->post('create_user_btn') || $this->form_validation->run() == false){
 	        $data['contentView'] = 'users/create_user_form';
-	        $data['title'] = 'Create Group';
+	        $data['title'] = 'Create User';
 	        $this->template($data);
 		}else{
 			$username = 'user_';
@@ -133,22 +133,13 @@ class Users extends MY_Controller {
 			$group = $this->input->post('assigned_group');
 
 			$create_user = $this->ion_auth->register($username, $password, $email, $additional_data, $group);
-			if($create_user){
-				$new_user = $this->ion_auth->user($create_user)->result();
-				if($auto_activate = $this->input->post('auto_active')){
-					$activate_user = $this->ion_auth->activate($new_user->user_id, $new_user->activation_code);
-					if($activate_user){
-						// Return confirmation/user information $new_user
-					}else{
-						$activate_user_errors = $this->ion_auth->errors();
-						// Return the errors
-					}
-				}else{
-				// Return confirmation
-				}
-			}else{
+			if(!$create_user){
 				$create_user_errors = $this->ion_auth->errors();
-				// Return the errors
+				$this->session->set_flashdata('create_user_response', $create_user_errors);
+				redirect('users/create_user', 'refresh');
+			}else{
+				$this->session->set_flashdata('create_user_response', '<div class="alert alert-success">User Created!</div>');
+				redirect('users/create_user', 'refresh');
 			}
 		}
 	}
@@ -189,42 +180,51 @@ class Users extends MY_Controller {
 		}
 	}
 
-	public function update_user($user_id){
-		$user = $this->ion_auth->user($user_id)->row();
-
-		$this->form_validation->set_rules('surname', 'Surname', 'trim|required');
-		$this->form_validation->set_rules('other_names', 'Other Names', 'trim|required');
-		$this->form_validation->set_rules('gender', 'Gender', 'required');
-		$this->form_validation->set_rules('sub_county', 'Sub County', 'required');
-		$this->form_validation->set_rules('birthday', 'Birthday', 'required');
-		
-		if($this->input->post('phone') && $user->phone !== $this->input->post('phone')){
-			$this->form_validation->set_rules('phone', 'Phone', 'trim}required|is_numeric|exact_length[12]|is_unique[users.phone]');
-		}
-
-		if(!$this->input->post('update_user_btn') && $this->form_validation->run() == false){
-			// Show the form
+	public function update_user($user_id=false){
+		if($user_id === false){
+			show_error('The User ID is required to update user!');
 		}else{
-			$id = $user_id;
-			$data = array(
-				'surname' => $this->input->post('surname'),
-				'other_names' => $this->input->post('other_names'),
-				'other_names' => $this->input->post('other_names'),
-				'gender' => $this->input->post('gender'),
-				'sub_county_id' => $this->input->post('sub_county'),
-				'birthday' => $this->input->post('birthday'),
-			);
+			$user = $this->ion_auth->user($user_id)->row();
 
-			if($this->input->post('phone')){
-				$data['phone'] = $this->input->post('phone');
+			$this->form_validation->set_rules('surname', 'Surname', 'trim|required');
+			$this->form_validation->set_rules('other_names', 'Other Names', 'trim|required');
+			$this->form_validation->set_rules('gender', 'Gender', 'required');
+			$this->form_validation->set_rules('sub_county', 'Sub County', 'required');
+			$this->form_validation->set_rules('birthday', 'Birthday', 'required');
+			
+			if($this->input->post('phone') && $user->phone !== $this->input->post('phone')){
+				$this->form_validation->set_rules('phone', 'Phone', 'trim}required|is_numeric|exact_length[10]|is_unique[users.phone]');
 			}
 
-			$update_user = $this->ion_auth->update($user_id, $data);
-			if($update_user){
-				// Return confirmation
+			if(!$this->input->post('update_user_btn') && $this->form_validation->run() == false){
+		        $data['contentView'] = 'users/update_user_form';
+		        $data['title'] = 'Update User';
+		        $data['user'] = $user;
+		        $this->template($data);
 			}else{
-				$update_user_errors = $this->ion_auth->errors();
-				// Return the errors
+				$id = $user_id;
+				$data = array(
+					'surname' => $this->input->post('surname'),
+					'other_names' => $this->input->post('other_names'),
+					'other_names' => $this->input->post('other_names'),
+					'gender' => $this->input->post('gender'),
+					'sub_county_id' => $this->input->post('sub_county'),
+					'birthday' => $this->input->post('birthday'),
+				);
+
+				if($this->input->post('phone')){
+					$data['phone'] = $this->input->post('phone');
+				}
+
+				$update_user = $this->ion_auth->update($user_id, $data);
+				if($update_user){
+					$this->session->set_flashdata('update_user_response', '<div class="alert alert-success">Changes Saved!</div>');
+					redirect('users/update_user/'.$user_id, 'refresh');
+				}else{
+					$update_user_errors = $this->ion_auth->errors();
+					$this->session->set_flashdata('update_user_response', $update_user_response);
+					redirect('users/update_user/'.$user_id, 'refresh');
+				}
 			}
 		}
 	}

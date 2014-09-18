@@ -1,7 +1,17 @@
 <div class="col-md-10 col-md-offset-1">
+  <script>
+    $(function() {
+      $( "#datepicker" ).datepicker({ 
+        maxDate: "-18y",
+        changeMonth: true,
+        changeYear: true
+      });
+    });
+  </script>
+
   <?php
-    $create_group_response = $this->session->flashdata('create_group_response');
-    echo $create_group_response;
+    $create_user_response = $this->session->flashdata('create_user_response');
+    echo $create_user_response;
     echo form_open('users/create_user', array('class'=>'form-horizontal', 'role'=>'form'));
   ?>
       <legend>Create User</legend>
@@ -33,7 +43,7 @@
       <div class="form-group">
         <label for="birthday" class="col-sm-2 control-label">Birthday</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control" name="birthday" value="<?php echo set_value('birthday'); ?>" placeholder="Select Birthday">
+          <input type="text" class="form-control" id="datepicker" name="birthday" value="<?php echo set_value('birthday'); ?>" placeholder="Select Birthday">
           <?php echo form_error('birthday'); ?>
         </div>
       </div>
