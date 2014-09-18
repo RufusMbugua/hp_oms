@@ -12,12 +12,19 @@ class Manage extends MX_Controller {
 		// Projects dashboard where all project actions can be triggered from
     }
 
-	public function create_project(){
-		// Array of data. !!--> Include project roles
+	public function new_category(){
 
 	}
 
-	public function update_project($project_id, $project_data){
+	public function edit_category($category_id){
+
+	}
+
+	public function create_project(){
+
+	}
+
+	public function update_project($project_id){
 
 	}
 

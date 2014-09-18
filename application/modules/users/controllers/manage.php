@@ -4,6 +4,8 @@ class Manage extends MY_Controller {
 
 	public function __construct(){
 		parent::__construct();
+		$this->load->model('manage_m');
+
 		$this->load->library('ion_auth');
 
 		$this->load->library('form_validation');
@@ -177,7 +179,22 @@ class Manage extends MY_Controller {
 	}
 
 	public function assign_user($user_id){
-		// Assign a user to a project
+		/*
+			The user is assigned according to the role he/she is currently playing.
+			Change role to assign to project in new role
+		*/
+		$this->form_validation->set_rules('project_id', 'Project', 'required');
+		
+		if(!$this->input->post('assign_user_btn') && $this->form_validation->run() == false){
+			// Show the form
+		}else{
+			$assign_user = $this->manage_m->assign_user_to_project($user_id);
+			if($assign_user){
+				// Return confirmation
+			}else{
+				// Return error response
+			}
+		}
 	}
 
 	public function user($user_id){
