@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Datagrid extends MX_Controller {
+class Datagrid extends MY_Controller {
 
 	function __construct()
 	{
