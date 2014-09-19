@@ -1,4 +1,5 @@
-<div class="small tile">
+<div class="row">
+	<div class="small tile">
 	<div class="outer">
 	<div class="title">Title</div>
 		<div class="inner">test</div>
@@ -22,14 +23,23 @@
 		<div class="inner">test</div>
 	</div>
 </div>
-<div class="large tile">
-<div class="title">Large</div>
+</div>
+<div class="row">
+	<div class="medium tile">
 	<div class="outer">
 
-		<div class="inner">test</div>
+		<?php $this->load->view('calendar/index');?>
 	</div>
 </div>
-<div class="mini tile">
+<div class="medium tile">
+	<div class="outer">
+<div class="title">Title</div>
+		<div class="inner">test</div>
+	</div>
+	</div>	
+</div>
+<div class="row">
+	<div class="mini tile">
 	<div class="outer">
 		<div class="inner">mini</div>
 	</div>
@@ -51,3 +61,8 @@
 		</div>
 	</div>
 </div>
+
+</div>
+
+
+
