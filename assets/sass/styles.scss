@@ -13,7 +13,7 @@ $hp_grey:#767676;
     box-shadow: 0px 1px 5px 0px #d3d3d3;
     margin-bottom: 5px;
     font-size: 0.8em !important;
- border-bottom-left-radius:3px;
+    border-bottom-left-radius:3px;
     border-bottom-right-radius:3px;
     margin-bottom:20px;
 
@@ -24,25 +24,25 @@ $hp_grey:#767676;
     padding:0 1.5% 2% 1.5%;
 
     form, ul {
-    width: 100%;
-    height: 90%;
-    padding: 0 1.5% 0 1.5%;
-    overflow-y: auto;
-    @extend .epsilon;
-   
-}
+        width: 100%;
+        height: 90%;
+        padding: 0 1.5% 0 1.5%;
+        overflow-y: auto;
+        @extend .epsilon;
+
+    }
 }
 body{
     background:#f1f2f7;
     font-size:10px !important;
-    padding:0;
+    padding:0 !important;
+    margin:0 !important;
     font-family: OpenSansRegular !important;
 }
 
 // Styles
 #content_view{
     margin-top:5px;
-    @extend .row;
 }
 #sidebar{
     padding:0px;
@@ -55,7 +55,7 @@ body{
     .active{
         color:$hp_blue !important;
         .label{
-           background:$hp_blue !important; 
+            background:$hp_blue !important;
         }
     }
 
@@ -67,7 +67,7 @@ body{
         font-weight:bold;
     }
     .active.item{
-background:$hp_grey;
+        background:$hp_grey;
     }
     .item{
         color:white;
@@ -84,27 +84,40 @@ background:$hp_grey;
     border-radius:3px;
     .title{
         border-top-left-radius:3px;
-    border-top-right-radius:3px;
-        padding:2px 6px;
-        margin-bottom:0;
-            @extend .delta;
-             background:$hp_blue;
-             color:white;
-            // background:#d9d9d9;
-        }
+        border-top-right-radius:3px;
+        padding:5px 10px !important;
+        margin-bottom:0 !important;
+        @extend .epsilon;
+        background:$hp_blue;
+        color:white;
+        // background:#d9d9d9;
+    }
     .outer{
-@include tile;
+        @include tile;
         .inner{
-@include inner-style(30%);
+            @include inner-style(20%);
+        }
     }
-    }
-    
+
 }
 .large.tile{
     @extend .col-md-12;
+    .outer{
+
+        .inner{
+            @include inner-style(50%);
+        }
+    }
+
 }
 .medium.tile{
     @extend .col-md-6;
+    .outer{
+
+        .inner{
+            @include inner-style(40%);
+        }
+    }
 }
 .mini.tile{
     @extend .col-md-3;
@@ -122,12 +135,57 @@ background:$hp_grey;
         @extend .epsilon;
     }
     .outer{
-    .inner{
-        border-top-left-radius:3px;
-    border-top-right-radius:3px;
-padding:0;
-       
-}
+        .inner{
+            border-top-left-radius:3px;
+            border-top-right-radius:3px;
+            padding:0;
+
+        }
     }
-    
+
+}
+//Calendar Overrides
+.fc-toolbar{
+    @extend .title;
+    font-size:16px !important;
+    font-size:1.1666666667rem;
+    .fc-button-group{
+        @extend .ui;
+        @extend .buttons;
+    }
+    .fc-left{
+        float:left;
+    }
+    .fc-center{
+        text-align:center !important;
+    }
+    .fc-right{
+        float:right;
+    }
+    button{
+        font-size: 8px !important;
+        @extend .ui;
+        @extend .button;
+        @extend .black;
+    }
+    h2{
+        margin-bottom:0 !important;
+        font-size:1.1666666667rem;
+        color:white !important;
+    }
+}
+//.fc-view-container{
+//
+//    table{
+//        font-size:10px;
+//        width:100% !important;
+//
+//    }
+//    .fc-row{
+//
+//    }
+//}
+#calendar{
+    max-width:100% !important;
+    height:50%;
 }

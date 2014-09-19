@@ -9,9 +9,16 @@
 <!-- Styles -->
 <link rel="stylesheet" href="<?php echo base_url('assets/stylesheets/styles.css');?>">
 <link rel="stylesheet" href="<?php echo base_url('assets/bower_components/webfont-opensans/stylesheet.css');?>">
+
 <link rel="stylesheet" href="<?php echo base_url('assets/bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css');?>">
+
+<!-- Calendar -->
+<link rel="stylesheet" href="<?php echo base_url().'assets/bower_components/fullcalendar/dist/fullcalendar.min.css'; ?>"/>
+<!-- <link rel="stylesheet" href="<?php echo base_url().'assets/modules/calendar/calendar.css'; ?>"/> -->
 
 <!-- Javascript -->
 <script src="<?php echo base_url('assets/bower_components/jquery/dist/jquery.js');?>"></script>
 <script src="<?php echo base_url('assets/bower_components/semantic-ui/build/packaged/javascript/semantic.js');?>"></script>
+
 <script src="<?php echo base_url('assets/bower_components/jquery-ui/jquery-ui.min.js');?>"></script>
+
