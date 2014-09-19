@@ -1,6 +1,7 @@
-# OFFICE MANAGEMENT SYSTEM (OMS) + ISSUE TRACKER
-	-	[HP-Strathmore Researh Lab](http://www.hp-strathmore.org)
-	-	[OMS](http://www.hp-strathmore.org/oms)
+# OFFICE MANAGEMENT SYSTEM (OMS) + ISSUE TRACKER:
+
+-	[HP-Strathmore Researh Lab](http://www.hp-strathmore.org)
+-	[OMS](http://www.hp-strathmore.org/oms)
 
 ## Built on
 CodeIgniter 2 + HMVC + Doctrine 2:
