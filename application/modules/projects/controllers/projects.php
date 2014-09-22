@@ -10,41 +10,53 @@ class Projects extends MY_Controller {
 
 	public function create()
 	{
-		if($this->input->post('create_project_btn'))
+		if(!$this->input->post('create_project_btn'))
 		{
+	        $data['contentView'] = 'projects/forms/create_project_form';
+	        $data['title'] = 'Create Project';
+	        $this->template($data);
+	    }
+	    else
+	    {
 			$create_project = $this->projects_m->create_project();
 			if($create_project)
 			{
-				return TRUE;
+				die('Project created.');
 			}
 			else
 			{
-				return FALSE;
+				die('Could not create project.');
 			}
-		}
-		else
-		{
-			return FALSE;
-		}
+	    }
 	}
 
 	public function update($id)
 	{
 		if(is_null($id) || !is_numeric($id))
 		{
-			return FALSE;
+			die('Numeric value expected in ID.');
 		}
 		else
 		{
-			$update_project = $this->projects_m->update_project($id);
-			if($update_project)
+			if(!$this->input->post('update_project_btn'))
 			{
-				return TRUE;
-			}
-			else
-			{
-				return FALSE;
-			}
+		        $data['contentView'] = 'projects/forms/update_project_form';
+		        $data['title'] = 'Update Project';
+		        $data['project'] = $this->projects_m->get_project($id);
+		        $this->template($data);
+		    }
+		    else
+		    {
+				$update_project = $this->projects_m->update_project($id);
+				if((bool) $update_project)
+				{
+					redirect('projects/update/'.$id, 'refresh');
+				}
+				else
+				{
+					die('Could not update project details');
+				}
+		    }
 		}
 	}
 
@@ -52,18 +64,18 @@ class Projects extends MY_Controller {
 	{
 		if(is_null($id) || !is_numeric($id))
 		{
-			return FALSE;
+			die('Numeric value expected in ID.');
 		}
 		else
 		{
 			$delete_project = $this->projects_m->delete_project($id);
 			if($delete_project)
 			{
-				return TRUE;
+				die('Project deleted');
 			}
 			else
 			{
-				return FALSE;
+				die('Could not delete project!');
 			}
 		}
 	}
@@ -76,37 +88,44 @@ class Projects extends MY_Controller {
 				$projects = $this->projects_m->get_projects();
 				if($projects)
 				{
-					return $projects;
+					echo '<pre>';
+					print_r($projects);
 				}
 				else
 				{
-					return FALSE;
+					die('Could not get projects or none are listed');
 				}
 				break;
 
 			case 'project':
 				if(is_null($id) || !is_numeric($id))
 				{
-					# Show error
+					die('Numeric value expected in ID.');
 				}
 				else
 				{
 					$project = $this->projects_m->get_project($id);
 					if($project)
 					{
-						return $project;
+						echo '<pre>';
+						print_r($project);
 					}
 					else
 					{
-						return FALSE;
+						die('Could not get project');
 					}
 				}
 				break;
 
 			default:
-				# Show error
+				die('Could not process your request');
 				break;
 		}
 	}
+
+    public function template($data) {
+        $this->load->module('template');
+        $this->template->index($data);
+    }
 
 }

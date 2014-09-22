@@ -2,9 +2,4 @@
 
 class Groups_m extends CI_Model {
 
-	public function delete_group($id)
-	{
-
-	}
-
 }
