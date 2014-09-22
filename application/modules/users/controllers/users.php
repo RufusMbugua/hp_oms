@@ -50,12 +50,6 @@ class Users extends MY_Controller {
 		}
 		else
 		{
-			$this->input->post('surname');
-			$this->input->post('other_names');
-			$this->input->post('gender');
-			$this->input->post('birthday');
-			$this->input->post('phone');
-
 			if(!$this->input->post('update_user_btn'))
 			{
 		        $data['contentView'] = 'users/forms/update_user_form';
@@ -116,7 +110,17 @@ class Users extends MY_Controller {
 		}
 		else
 		{
-			# Activate user
+			$activate_user = $this->ion_auth->activate($id);
+			if($activate_user)
+			{
+				$messages = $this->ion_auth->messages();
+				die($messages);
+			}
+			else
+			{
+				$errors = $this->ion_auth->errors();
+				die($errors);
+			}
 		}
 	}
 
@@ -124,32 +128,151 @@ class Users extends MY_Controller {
 	{
 		if(is_null($id) || !is_numeric($id))
 		{
-			# Show error
+			die('Numeric value expected in ID.');
 		}
 		else
 		{
-			# Deactivate user
+			$deactivate_user = $this->ion_auth->deactivate($id);
+			if($deactivate_user)
+			{
+				$messages = $this->ion_auth->messages();
+				die($messages);
+			}
+			else
+			{
+				$errors = $this->ion_auth->errors();
+				die($errors);
+			}
 		}
 	}
 
 	public function login()
 	{
-		
+		if(!$this->input->post('login_user_btn'))
+		{
+	        $data['contentView'] = 'users/forms/login_form';
+	        $data['title'] = 'Login';
+	        $this->template($data);
+	    }
+	    else
+	    {
+			$identity = $this->input->post('email_address');
+			$password = $this->input->post('account_password');
+			$login_user = $this->ion_auth->login($identity, $password);
+			if($login_user)
+			{
+				$user = $this->ion_auth->user()->row();
+				$messages = $this->ion_auth->messages();
+				echo $messages.'<pre>';
+				print_r($user);
+				die();
+			}
+			else
+			{
+				$errors = $this->ion_auth->errors();
+				die($errors);
+			}
+	    }
 	}
 
 	public function forgot_password()
 	{
-		
+		if(!$this->input->post('forgot_password_btn'))
+		{
+	        $data['contentView'] = 'users/forms/forgot_password_form';
+	        $data['title'] = 'Forgot Password';
+	        $this->template($data);
+	    }
+	    else
+	    {
+			$identity = $this->ion_auth->where('email', strtolower($this->input->post('email_address')))->users()->row();
+			if($identity)
+			{
+				$forgot_password = $this->ion_auth->forgotten_password($identity->email);
+				if($forgot_password)
+				{
+					$messages = $this->ion_auth->messages();
+					die($messages);
+				}
+				else
+				{
+					$errors = $this->ion_auth->errors();
+					die($errors);
+				}
+			}
+			else
+			{
+				die('User not found');
+			}
+		}
 	}
 
-	public function reset_password($code)
+	public function reset_password($code = NULL)
 	{
-		
+		if($code)
+		{
+			$user = $this->ion_auth->forgotten_password_check($code);
+			if($user)
+			{
+				if(!$this->input->post('reset_password_btn'))
+				{
+			        $data['contentView'] = 'users/forms/reset_password_form';
+			        $data['title'] = 'Reset Password';
+			        $this->template($data);
+				}
+				else
+				{
+					$reset_password = $this->ion_auth->reset_password($user->email, $this->input->post('new_password'));
+
+					if($reset_password)
+					{
+						$messages = $this->ion_auth->messages();
+						die($messages);
+						// $this->logout();
+					}
+					else
+					{
+						$errors = $this->ion_auth->errors();
+						die($errors);
+					}
+				}
+			}
+			else
+			{
+				die('Invalid code!');
+			}
+		}
+		else{
+			show_404();
+		}
 	}
 
 	public function change_password()
 	{
-		
+		# Should be logged in
+		$user = $this->ion_auth->user()->row();
+
+		if(!$this->input->post('change_password_btn'))
+		{
+	        $data['contentView'] = 'users/forms/change_password_form';
+	        $data['title'] = 'Change Password';
+	        $this->template($data);
+	    }
+	    else
+	    {
+			$change_password = $this->ion_auth->change_password($user->email, $this->input->post('old_password'), $this->input->post('new_password'));
+			if($change_password)
+			{
+				$messages = $this->ion_auth->messages();
+				die($messages);
+				// $this->logout();
+			}
+			else
+			{
+				$errors = $this->ion_auth->errors();
+				die($errors);
+			}
+	    }
 	}
 
 	public function view($flag, $id=NULL)
@@ -157,22 +280,30 @@ class Users extends MY_Controller {
 		switch($flag)
 		{
 			case 'all':
-				# Show all users
+				$users = $this->ion_auth->users()->row();
+
+				echo '<pre>';
+				print_r($users);
+				die();
 				break;
 
 			case 'user':
 				if(is_null($id) || !is_numeric($id))
 				{
-					# Show error
+					die('Numeric value expected in ID.');
 				}
 				else
 				{
-					# Show user profile
+					$user = $this->ion_auth->user($id)->row();
+					
+					echo '<pre>';
+					print_r($user);
+					die();
 				}
 				break;
 
 			default:
-				# Show error
+				die('Could not process your request');
 				break;
 		}
 	}

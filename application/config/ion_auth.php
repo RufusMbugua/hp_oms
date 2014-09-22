@@ -129,7 +129,8 @@ $config['email_config'] = array(
  | Folder where email templates are stored.
  | Default: auth/
  */
-$config['email_templates'] = 'modules/users/views/auth_email_tpls/';
+$config['email_templates'] = 'auth_email_tpls/';
+
 
 /*
  | -------------------------------------------------------------------------
