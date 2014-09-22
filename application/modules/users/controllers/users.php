@@ -70,12 +70,6 @@ class Users extends MY_Controller {
 		}
 	}
 
-	public function login()
-	{
-		$this->input->post('email_address');
-		$this->input->post('account_password');
-	}
-
 	public function view($flag, $id=NULL)
 	{
 		switch($flag)

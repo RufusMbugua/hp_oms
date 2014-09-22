@@ -24,11 +24,12 @@ class Groups extends MY_Controller {
 			$create_group = $this->ion_auth->create_group($group_name, $group_description);
 			if(!$create_group)
 			{
-				return FALSE;
+				$errors = $this->ion_auth->errors();
+				die($errors);
 			}
 			else
 			{
-				return TRUE;
+				die('Group created!');
 			}
 	    }
 	}
@@ -46,7 +47,7 @@ class Groups extends MY_Controller {
 	    {
 			if(is_null($id) || !is_numeric($id))
 			{
-				return FALSE;
+				die('Numeric value expected in ID.');
 			}
 			else
 			{
@@ -56,11 +57,12 @@ class Groups extends MY_Controller {
 				$update_group = $this->ion_auth->update_group($id, $group_name, $group_description);
 				if($update_group)
 				{
-					return TRUE;
+					die('Group updated!');
 				}
 				else
 				{
-					return FALSE;
+					$errors = $this->ion_auth->errors();
+					die($errors);
 				}
 			}
 		}
@@ -70,18 +72,28 @@ class Groups extends MY_Controller {
 	{
 		if(is_null($id) || !is_numeric($id))
 		{
-			return FALSE;
+			die('Numeric value expected in ID.');
 		}
 		else
 		{
-			$delete_group = $this->groups_m->delete_group($id);
-			if($update_group)
+			$group = $this->ion_auth->group($id)->result();
+			if(count($group) !== 0)
 			{
-				return TRUE;
+				$delete_group = $this->ion_auth->delete_group($id);
+				if($delete_group)
+				{
+					$messages = $this->ion_auth->messages();
+					die($messages);
+				}
+				else
+				{
+					$errors = $this->ion_auth->errors();
+					die($errors);
+				}
 			}
 			else
 			{
-				return FALSE;
+				die('Group not found');
 			}
 		}
 	}
@@ -92,37 +104,39 @@ class Groups extends MY_Controller {
 		{
 			case 'all':
 				$groups = $this->ion_auth->groups()->result();
-				if($groups)
+				if(count($groups) !== 0)
 				{
-					return $groups; 
+					echo '<pre>';
+					print_r($groups); 
 				}
 				else
 				{
-					return FALSE;
+					die('No groups found');
 				}
 				break;
 
 			case 'group':
 				if(is_null($id) || !is_numeric($id))
 				{
-					return FALSE;
+					die('Numeric value expected in ID.');
 				}
 				else
 				{
 					$group = $this->ion_auth->group($id)->result();
-					if(is_array($group))
+					if(count($group) !== 0)
 					{
-						return $group;
+						echo '<pre>';
+						print_r($group); 
 					}
 					else
 					{
-						return FALSE;
+						die('Group not found.');
 					}
 				}
 				break;
 
 			default:
-				return FALSE;
+				die('Could not process request.');
 				break;
 		}
 	}
