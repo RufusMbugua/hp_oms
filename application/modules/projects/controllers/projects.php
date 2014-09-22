@@ -5,27 +5,46 @@ class Projects extends MY_Controller {
 	public function __construct()
 	{
 		parent::__construct();
+		$this->load->model('projects_m');
 	}
 
 	public function create()
 	{
-		$this->input->post('project_name');
-		$this->input->post('project_description');
-		$this->input->post('project_url');
+		if($this->input->post('create_project_btn'))
+		{
+			$create_project = $this->projects_m->create_project();
+			if($create_project)
+			{
+				return TRUE;
+			}
+			else
+			{
+				return FALSE;
+			}
+		}
+		else
+		{
+			return FALSE;
+		}
 	}
 
 	public function update($id)
 	{
 		if(is_null($id) || !is_numeric($id))
 		{
-			# Show error
+			return FALSE;
 		}
 		else
 		{
-			$this->input->post('project_name');
-			$this->input->post('project_description');
-			$this->input->post('project_url');
-			# Update project
+			$update_project = $this->projects_m->update_project($id);
+			if($update_project)
+			{
+				return TRUE;
+			}
+			else
+			{
+				return FALSE;
+			}
 		}
 	}
 
@@ -33,11 +52,19 @@ class Projects extends MY_Controller {
 	{
 		if(is_null($id) || !is_numeric($id))
 		{
-			# Show error
+			return FALSE;
 		}
 		else
 		{
-			# Delete project
+			$delete_project = $this->projects_m->delete_project($id);
+			if($delete_project)
+			{
+				return TRUE;
+			}
+			else
+			{
+				return FALSE;
+			}
 		}
 	}
 
@@ -46,7 +73,15 @@ class Projects extends MY_Controller {
 		switch($flag)
 		{
 			case 'all':
-				# Show all projects
+				$projects = $this->projects_m->get_projects();
+				if($projects)
+				{
+					return $projects;
+				}
+				else
+				{
+					return FALSE;
+				}
 				break;
 
 			case 'project':
@@ -56,7 +91,15 @@ class Projects extends MY_Controller {
 				}
 				else
 				{
-					# Show project profile
+					$project = $this->projects_m->get_project($id);
+					if($project)
+					{
+						return $project;
+					}
+					else
+					{
+						return FALSE;
+					}
 				}
 				break;
 

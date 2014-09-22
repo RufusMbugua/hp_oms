@@ -1,29 +1,68 @@
-<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+<?php if(!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Groups extends MY_Controller {
 
 	public function __construct()
 	{
 		parent::__construct();
+		$this->load->library('ion_auth');
 	}
 
 	public function create()
 	{
-		$this->input->post('group_name');
-		$this->input->post('group_description');
+		if(!$this->input->post('create_group_btn'))
+		{
+	        $data['contentView'] = 'groups/forms/create_group_form';
+	        $data['title'] = 'Create Group';
+	        $this->template($data);
+	    }
+	    else
+	    {
+			$group_name = $this->input->post('group_name');
+			$group_description = $this->input->post('group_description');
+
+			$create_group = $this->ion_auth->create_group($group_name, $group_description);
+			if(!$create_group)
+			{
+				return FALSE;
+			}
+			else
+			{
+				return TRUE;
+			}
+	    }
 	}
 
 	public function update($id)
 	{
-		if(is_null($id) || !is_numeric($id))
+		if(!$this->input->post('update_group_btn'))
 		{
-			# Show error
-		}
-		else
-		{
-			$this->input->post('group_name');
-			$this->input->post('group_description');
-			# Update group
+	        $data['contentView'] = 'groups/forms/update_group_form';
+	        $data['title'] = 'Update Group';
+	        $data['group_info'] = $this->view('group', $id);
+	        $this->template($data);
+	    }
+	    else
+	    {
+			if(is_null($id) || !is_numeric($id))
+			{
+				return FALSE;
+			}
+			else
+			{
+				$group_name = $this->input->post('group_name');
+				$group_description = $this->input->post('group_description');
+				
+				$update_group = $this->ion_auth->update_group($id, $group_name, $group_description);
+				if($update_group)
+				{
+					return TRUE;
+				}
+				else
+				{
+					return FALSE;
+				}
+			}
 		}
 	}
 
@@ -31,11 +70,19 @@ class Groups extends MY_Controller {
 	{
 		if(is_null($id) || !is_numeric($id))
 		{
-			# Show error
+			return FALSE;
 		}
 		else
 		{
-			# Delete group
+			$delete_group = $this->groups_m->delete_group($id);
+			if($update_group)
+			{
+				return TRUE;
+			}
+			else
+			{
+				return FALSE;
+			}
 		}
 	}
 
@@ -44,24 +91,45 @@ class Groups extends MY_Controller {
 		switch($flag)
 		{
 			case 'all':
-				# Show all groups
+				$groups = $this->ion_auth->groups()->result();
+				if($groups)
+				{
+					return $groups; 
+				}
+				else
+				{
+					return FALSE;
+				}
 				break;
 
 			case 'group':
 				if(is_null($id) || !is_numeric($id))
 				{
-					# Show error
+					return FALSE;
 				}
 				else
 				{
-					# Show group profile
+					$group = $this->ion_auth->group($id)->result();
+					if(is_array($group))
+					{
+						return $group;
+					}
+					else
+					{
+						return FALSE;
+					}
 				}
 				break;
 
 			default:
-				# Show error
+				return FALSE;
 				break;
 		}
 	}
+
+    public function template($data) {
+        $this->load->module('template');
+        $this->template->index($data);
+    }
 
 }
