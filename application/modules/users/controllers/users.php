@@ -275,7 +275,7 @@ class Users extends MY_Controller {
 	    }
 	}
 
-	public function view($flag, $id=NULL)
+	public function view($flag, $id=NULL, $action=NULL)
 	{
 		switch($flag)
 		{
@@ -294,11 +294,22 @@ class Users extends MY_Controller {
 				}
 				else
 				{
+					switch($action)
+					{
+						case 'view':
+							echo '<pre>';
+							print_r($user);
+							die();
+							break;
+						case 'assign_group':
+							$this->_assign_group($id);
+							break;
+						default:
+							die('Could not process your request');
+							break;
+					}
 					$user = $this->ion_auth->user($id)->row();
 					
-					echo '<pre>';
-					print_r($user);
-					die();
 				}
 				break;
 
@@ -308,39 +319,47 @@ class Users extends MY_Controller {
 		}
 	}
 
-	public function assign_group($id)
+	function _assign_group($id)
 	{
 		if(is_null($id) || !is_numeric($id))
 		{
-			# Show error
+			die('Numeric value expected in ID.');
 		}
 		else
 		{
-			# Assign group
-		}
-	}
-
-	public function update_group_assignment($flag, $id)
-	{
-		if(is_null($id) || !is_numeric($id))
-		{
-			# Show error
-		}
-		else
-		{
-			switch($flag)
+			if(!$this->input->post('assign_group_btn'))
 			{
-				case 'add':
-					# Add to passed group
-					break;
+		        $data['contentView'] = 'users/forms/assign_group_form';
+		        $data['title'] = 'Assign Group';
+		        $data['user'] = $this->ion_auth->user($id)->row();
+		        $data['groups_info'] = $this->ion_auth->groups()->result();
+		        $this->template($data);
+		    }
+		    else
+		    {
+		    	$group_id = $this->input->post('group_id');
+				$user_groups = $this->ion_auth->get_users_groups($id)->result();
 
-				case 'remove':
-					# Remove from passed group
-					break;
+				if(count($user_groups) !== 0)
+				{
+					# Remove user from groups
+					foreach($user_groups as $user_group)
+					{
+						$this->ion_auth->remove_from_group($user_group->id, $id);
+					}
+				}
 
-				default:
-					# Show error
-					break;
+				$assign_group = $this->ion_auth->add_to_group($group_id, $id);
+				if($assign_group)
+				{
+					$messages = $this->ion_auth->messages();
+					die($messages);
+				}
+				else
+				{
+					$errors = $this->ion_auth->errors();
+					die($errors);
+				}
 			}
 		}
 	}
