@@ -6,6 +6,7 @@ class Users extends MY_Controller {
 	{
 		parent::__construct();
 		$this->load->library('ion_auth');
+		$this->load->model('users_m');
 	}
 
 	public function create()
@@ -385,8 +386,15 @@ class Users extends MY_Controller {
 		    }
 		    else
 		    {
-				# Assign user to passed project
-				# If user alerdy in other project, alert (needs confirmation). If not, just assign
+		    	$add_to_project = $this->users_m->add_to_project($id);
+		    	if($add_to_project)
+		    	{
+		    		die('User added to project');
+		    	}
+		    	else
+		    	{
+		    		die('Could not add user to project');
+		    	}
 			}
 		}
 	}
