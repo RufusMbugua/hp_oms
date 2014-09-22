@@ -304,6 +304,9 @@ class Users extends MY_Controller {
 						case 'assign_group':
 							$this->_assign_group($id);
 							break;
+						case 'assign_project':
+							$this->_assign_project($id);
+							break;
 						default:
 							die('Could not process your request');
 							break;
@@ -352,8 +355,7 @@ class Users extends MY_Controller {
 				$assign_group = $this->ion_auth->add_to_group($group_id, $id);
 				if($assign_group)
 				{
-					$messages = $this->ion_auth->messages();
-					die($messages);
+					die('User assigned to group!');
 				}
 				else
 				{
@@ -364,16 +366,28 @@ class Users extends MY_Controller {
 		}
 	}
 
-	public function assign_project($id)
+	function _assign_project($id)
 	{
 		if(is_null($id) || !is_numeric($id))
 		{
-			# Show error
+			die('Numeric value expected in ID.');
 		}
 		else
 		{
-			# Assign user to passed project
-			# If user alerdy in other project, alert (needs confirmation). If not, just assign
+			$this->load->model('projects/projects_m');
+			if(!$this->input->post('assign_project_btn'))
+			{
+		        $data['contentView'] = 'users/forms/assign_project_form';
+		        $data['title'] = 'Assign Project';
+		        $data['user'] = $this->ion_auth->user($id)->row();
+		        $data['projects_info'] = $this->projects_m->get_projects();
+		        $this->template($data);
+		    }
+		    else
+		    {
+				# Assign user to passed project
+				# If user alerdy in other project, alert (needs confirmation). If not, just assign
+			}
 		}
 	}
 
