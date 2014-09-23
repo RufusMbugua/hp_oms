@@ -2,11 +2,19 @@
 
   <div class="form-group">
     <label for="new_password">New Password</label>
-    <input type="password" class="form-control" name="new_password">
+    <?php
+      echo form_error('new_password');
+      $new_password = array('class'=>'form-control', 'name'=>'new_password', 'value'=>set_value('new_password'));
+      echo form_password($new_password);
+    ?>
   </div>
   <div class="form-group">
     <label for="confirm_password">Confirm Password</label>
-    <input type="password" class="form-control" name="confirm_password">
+    <?php
+      echo form_error('confirm_password');
+      $confirm_password = array('class'=>'form-control', 'name'=>'confirm_password');
+      echo form_password($confirm_password);
+    ?>
   </div>
   <div class="form-group">
     <input type="submit" name="reset_password_btn" value="Reset Password" class="btn btn-primary">

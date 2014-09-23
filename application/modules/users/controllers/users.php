@@ -5,8 +5,12 @@ class Users extends MY_Controller {
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->library('ion_auth');
 		$this->load->model('users_m');
+
+		$restricted_pages = array('create', 'update', 'delete', 'activate', 'deactivate', 'change_password', 'view');
+		$current_page = $this->uri->segment(2);
+
+		$this->check_for_login($current_page, $restricted_pages);
 	}
 
 	public function create()
@@ -149,7 +153,9 @@ class Users extends MY_Controller {
 
 	public function login()
 	{
-		if(!$this->input->post('login_user_btn'))
+		$this->form_validation->set_rules('email_address', 'Email', 'required|valid_email');
+		$this->form_validation->set_rules('account_password', 'Password', 'required');
+		if(!$this->input->post('login_user_btn') || $this->form_validation->run() == FALSE)
 		{
 	        $data['contentView'] = 'users/forms/login_form';
 	        $data['title'] = 'Login';
@@ -162,11 +168,8 @@ class Users extends MY_Controller {
 			$login_user = $this->ion_auth->login($identity, $password);
 			if($login_user)
 			{
-				$user = $this->ion_auth->user()->row();
-				$messages = $this->ion_auth->messages();
-				echo $messages.'<pre>';
-				print_r($user);
-				die();
+				// Shows your profile
+				redirect('users/view/user/view/'.$this->user->user_id, 'refresh');
 			}
 			else
 			{
@@ -176,9 +179,16 @@ class Users extends MY_Controller {
 	    }
 	}
 
+	public function logout()
+	{
+		$this->ion_auth->logout();
+		redirect('users/login', 'refresh');
+	}
+
 	public function forgot_password()
 	{
-		if(!$this->input->post('forgot_password_btn'))
+		$this->form_validation->set_rules('email_address', 'Email', 'required|valid_email');
+		if(!$this->input->post('forgot_password_btn') || $this->form_validation->run() == FALSE)
 		{
 	        $data['contentView'] = 'users/forms/forgot_password_form';
 	        $data['title'] = 'Forgot Password';
@@ -215,7 +225,9 @@ class Users extends MY_Controller {
 			$user = $this->ion_auth->forgotten_password_check($code);
 			if($user)
 			{
-				if(!$this->input->post('reset_password_btn'))
+				$this->form_validation->set_rules('new_password', 'New Password', 'required|min_length[8]|max_length[50]');
+				$this->form_validation->set_rules('confirm_password', 'Confirm Password', 'required|matches[new_password]');
+				if(!$this->input->post('reset_password_btn') || $this->form_validation->run() == FALSE)
 				{
 			        $data['contentView'] = 'users/forms/reset_password_form';
 			        $data['title'] = 'Reset Password';
