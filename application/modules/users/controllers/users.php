@@ -337,7 +337,7 @@ class Users extends MY_Controller {
 				die('User with the ID <b>'.$flag.'</b> not found.');
 			}
 		}
-		elseif(is_string($flag))
+		elseif(is_string($flag) && $flag === 'all')
 		{
 			$users = $this->ion_auth->users()->row();
 			if(is_object($users))
