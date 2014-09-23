@@ -15,7 +15,13 @@ class Users extends MY_Controller {
 
 	public function create()
 	{
-		if(!$this->input->post('create_user_btn'))
+		$this->form_validation->set_rules('surname', 'Surname', 'trim|required');
+		$this->form_validation->set_rules('other_names', 'Other Names', 'trim|required');
+		$this->form_validation->set_rules('gender', 'Gender', 'required');
+		$this->form_validation->set_rules('birthday', 'Birthday', 'trim|required');
+		$this->form_validation->set_rules('phone', 'Phone', 'trim|required|is_numeric|exact_length[10]|is_unique[users.phone]');
+		$this->form_validation->set_rules('email_address', 'Email', 'trim|required|valid_email|is_unique[users.email]');
+		if(!$this->input->post('create_user_btn') || $this->form_validation->run() == FALSE)
 		{
 	        $data['contentView'] = 'users/forms/create_user_form';
 	        $data['title'] = 'Create User';
@@ -292,7 +298,7 @@ class Users extends MY_Controller {
 	{
 		switch($flag)
 		{
-			case 'users':
+			case 'all':
 				$users = $this->ion_auth->users()->row();
 				echo '<legend>All Users</legend>';
 				echo '<pre>';
@@ -337,7 +343,25 @@ class Users extends MY_Controller {
 
 	public function manage($id, $action)
 	{
-
+		if(is_null($id) || !is_numeric($id))
+		{
+			die('Numeric value expected in ID.');
+		}
+		else
+		{
+			switch($action)
+			{
+				case 'assign_to_group':
+					$this->_assign_group($id);
+					break;
+				case 'assign_to_group':
+					$this->_assign_project($id);
+					break;
+				default:
+					die('Could not process your request');
+					break;
+			}
+		}
 	}
 
 	function _assign_group($id)
