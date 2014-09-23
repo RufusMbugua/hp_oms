@@ -5,12 +5,12 @@ class Users extends MY_Controller {
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->model('users_m');
-
-		$restricted_pages = array('create', 'update', 'delete', 'activate', 'deactivate', 'change_password', 'view');
+		$restricted_pages = array('create', 'update', 'delete', 'activate', 'deactivate', 'change_password', 'view', 'logout');
 		$current_page = $this->uri->segment(2);
 
 		$this->check_for_login($current_page, $restricted_pages);
+
+		$this->load->model('users_m');
 	}
 
 	public function create()
@@ -168,8 +168,8 @@ class Users extends MY_Controller {
 			$login_user = $this->ion_auth->login($identity, $password);
 			if($login_user)
 			{
-				// Shows your profile
-				redirect('users/view/user/view/'.$this->user->user_id, 'refresh');
+				// Shows your profile // redirect('users/view/user/'.$this->user->user_id, 'refresh');
+				redirect('action_center', 'refresh');
 			}
 			else
 			{
@@ -288,11 +288,11 @@ class Users extends MY_Controller {
 	    }
 	}
 
-	public function view($flag, $id=NULL, $action=NULL)
+	public function view($flag, $id=NULL)
 	{
 		switch($flag)
 		{
-			case 'all':
+			case 'users':
 				$users = $this->ion_auth->users()->row();
 
 				echo '<pre>';
@@ -307,25 +307,10 @@ class Users extends MY_Controller {
 				}
 				else
 				{
-					switch($action)
-					{
-						case 'view':
-							echo '<pre>';
-							print_r($user);
-							die();
-							break;
-						case 'assign_group':
-							$this->_assign_group($id);
-							break;
-						case 'assign_project':
-							$this->_assign_project($id);
-							break;
-						default:
-							die('Could not process your request');
-							break;
-					}
 					$user = $this->ion_auth->user($id)->row();
-					
+					echo '<pre>';
+					print_r($user);
+					echo '</pre>';
 				}
 				break;
 
@@ -333,6 +318,11 @@ class Users extends MY_Controller {
 				die('Could not process your request');
 				break;
 		}
+	}
+
+	public function manage($id, $action)
+	{
+
 	}
 
 	function _assign_group($id)
