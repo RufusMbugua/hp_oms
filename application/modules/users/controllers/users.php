@@ -61,33 +61,52 @@ class Users extends MY_Controller {
 		}
 		else
 		{
-			if(!$this->input->post('update_user_btn'))
+			$user = $this->ion_auth->user($id)->row();
+			if(is_object($user))
 			{
-		        $data['contentView'] = 'users/forms/update_user_form';
-		        $data['title'] = 'Update User';
-		        $data['user'] = $this->ion_auth->user($id)->row();
-		        $this->template($data);
-		    }
-		    else
-		    {
-				$data = array(
-					'surname' => $this->input->post('surname'),
-					'other_names' => $this->input->post('other_names'),
-					'gender' => $this->input->post('gender'),
-					'birthday' => $this->input->post('birthday'),
-					'phone' => $this->input->post('phone'),
-				);
-				$update_user = $this->ion_auth->update($id, $data);
-				if($update_user)
+				$this->form_validation->set_rules('surname', 'Surname', 'trim|required');
+				$this->form_validation->set_rules('other_names', 'Other Names', 'trim|required');
+				$this->form_validation->set_rules('gender', 'Gender', 'required');
+				$this->form_validation->set_rules('birthday', 'Birthday', 'trim|required');
+				
+				$phone = $this->input->post('phone');
+				if($phone && ($phone !== $user->phone))
 				{
-					redirect('users/update/'.$id);
+					$this->form_validation->set_rules('phone', 'Phone', 'trim|required|is_numeric|exact_length[10]|is_unique[users.phone]');
 				}
-				else
+
+				if(!$this->input->post('update_user_btn') || $this->form_validation->run() == FALSE)
 				{
-					$errors = $this->ion_auth->errors();
-					die($errors);
-				}
-		    }
+			        $data['contentView'] = 'users/forms/update_user_form';
+			        $data['title'] = 'Update User';
+			        $data['user'] = $user;
+			        $this->template($data);
+			    }
+			    else
+			    {
+					$data = array(
+						'surname' => $this->input->post('surname'),
+						'other_names' => $this->input->post('other_names'),
+						'gender' => $this->input->post('gender'),
+						'birthday' => $this->input->post('birthday'),
+						'phone' => $this->input->post('phone'),
+					);
+					$update_user = $this->ion_auth->update($id, $data);
+					if($update_user)
+					{
+						redirect('users/update/'.$id);
+					}
+					else
+					{
+						$errors = $this->ion_auth->errors();
+						die($errors);
+					}
+			    }
+			}
+			else
+			{
+				die('Could not find user');
+			}
 		}
 	}
 
@@ -294,50 +313,48 @@ class Users extends MY_Controller {
 	    }
 	}
 
-	public function view($flag, $id=NULL)
+	public function view($flag)
 	{
-		switch($flag)
+		if(is_numeric($flag))
 		{
-			case 'all':
-				$users = $this->ion_auth->users()->row();
-				echo '<legend>All Users</legend>';
-				echo '<pre>';
-				print_r($users);
-				die();
-				break;
-
-			case 'user':
-				if(is_null($id) || !is_numeric($id))
+			$user = $this->ion_auth->user($flag)->row();
+			if(is_object($user))
+			{
+				if($user->user_id === $this->user->user_id)
 				{
-					die('Numeric value expected in ID.');
+					echo '<legend>My Profile</legend>';
 				}
 				else
 				{
-					$user = $this->ion_auth->user($id)->row();
-					if(is_object($user))
-					{
-						if($user->user_id === $this->user->user_id)
-						{
-							echo '<legend>My Profile</legend>';
-						}
-						else
-						{
-							echo '<legend>'.$user->surname.' '.$user->other_names.'</legend>';
-						}
-						echo '<pre>';
-						print_r($user);
-						echo '</pre>';
-					}
-					else
-					{
-						die('User with the ID <b>'.$id.'</b> not found.');
-					}
+					echo '<legend>'.$user->surname.' '.$user->other_names.'</legend>';
 				}
-				break;
-
-			default:
-				die('Could not process your request');
-				break;
+				echo '<pre>';
+				print_r($user);
+				echo '</pre>';
+			}
+			else
+			{
+				die('User with the ID <b>'.$flag.'</b> not found.');
+			}
+		}
+		elseif(is_string($flag))
+		{
+			$users = $this->ion_auth->users()->row();
+			if(is_object($users))
+			{
+				echo '<legend>All Users</legend>';
+				echo '<pre>';
+				print_r($users);
+				echo '</pre>';
+			}
+			else
+			{
+				die('Users not found.');
+			}
+		}
+		else
+		{
+			die('Could not process request');
 		}
 	}
 
