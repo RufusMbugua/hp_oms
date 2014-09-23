@@ -294,7 +294,7 @@ class Users extends MY_Controller {
 		{
 			case 'users':
 				$users = $this->ion_auth->users()->row();
-
+				echo '<legend>All Users</legend>';
 				echo '<pre>';
 				print_r($users);
 				die();
@@ -308,9 +308,24 @@ class Users extends MY_Controller {
 				else
 				{
 					$user = $this->ion_auth->user($id)->row();
-					echo '<pre>';
-					print_r($user);
-					echo '</pre>';
+					if(is_object($user))
+					{
+						if($user->user_id === $this->user->user_id)
+						{
+							echo '<legend>My Profile</legend>';
+						}
+						else
+						{
+							echo '<legend>'.$user->surname.' '.$user->other_names.'</legend>';
+						}
+						echo '<pre>';
+						print_r($user);
+						echo '</pre>';
+					}
+					else
+					{
+						die('User with the ID <b>'.$id.'</b> not found.');
+					}
 				}
 				break;
 
