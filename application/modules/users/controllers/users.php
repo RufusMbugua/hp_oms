@@ -255,6 +255,13 @@ class Users extends MY_Controller {
 				echo '<pre>';
 				print_r($user_groups);
 				echo '</pre>';
+
+				$user_projects = $this->users_m->get_user_projects($user->user_id);
+				echo '<legend>Projects Working On</legend>';
+				echo '<pre>';
+				print_r($user_projects);
+				echo '</pre>';
+
 				die();
 			}
 			else
@@ -291,6 +298,12 @@ class Users extends MY_Controller {
 					echo '<legend>Group In</legend>';
 					echo '<pre>';
 					print_r($user_groups);
+					echo '</pre>';
+
+					$user_projects = $this->users_m->get_user_projects($this->user->user_id);
+					echo '<legend>Projects Working On</legend>';
+					echo '<pre>';
+					print_r($user_projects);
 					echo '</pre>';
 
 					die();
@@ -485,6 +498,7 @@ class Users extends MY_Controller {
 	        $data['title'] = 'Assign Project';
 	        $data['user'] = $this->ion_auth->user($id)->row();
 	        $data['projects_info'] = $this->projects_m->get_projects();
+	        $data['groups_info'] = $this->ion_auth->groups()->result();
 	        $this->template($data);
 	    }
 	    else
