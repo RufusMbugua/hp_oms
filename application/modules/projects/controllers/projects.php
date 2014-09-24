@@ -10,7 +10,10 @@ class Projects extends MY_Controller {
 
 	public function create()
 	{
-		if(!$this->input->post('create_project_btn'))
+		$this->form_validation->set_rules('project_name', 'Project Name', 'trim|required');
+		$this->form_validation->set_rules('project_description', 'Project Description', 'trim|required');
+		$this->form_validation->set_rules('project_url', 'Project URL', 'trim|required|prep_url');
+		if(!$this->input->post('create_project_btn') || $this->form_validation->run() == FALSE)
 		{
 	        $data['contentView'] = 'projects/forms/create_project_form';
 	        $data['title'] = 'Create Project';
@@ -30,14 +33,72 @@ class Projects extends MY_Controller {
 	    }
 	}
 
-	public function update($id)
+	public function manage($id, $action)
 	{
-		if(is_null($id) || !is_numeric($id))
+		if(!is_numeric($id))
 		{
 			die('Numeric value expected in ID.');
 		}
 		else
 		{
+			switch ($action) {
+				case 'update':
+					$this->_update($id);
+					break;
+				
+				case 'delete':
+					$this->_delete($id);
+					break;
+				
+				default:
+					die('Could not process your request');
+					break;
+			}
+
+		}
+	}
+
+	public function view($flag)
+	{
+		if(is_numeric($flag))
+		{
+			$project = $this->projects_m->get_project($flag);
+			if($project)
+			{
+				echo 'The '.$project->project_name.' Project <pre>';
+				print_r($project);
+				echo '</pre>';
+			}
+			else
+			{
+				die('Could not get project');
+			}
+		}
+		elseif($flag === 'all')
+		{
+			$projects = $this->projects_m->get_projects();
+			if($projects)
+			{
+				echo 'All Projects <pre>';
+				print_r($projects);
+				echo '</pre>';
+			}
+			else
+			{
+				die('Could not get projects or none have been added yet');
+			}
+		}
+		else
+		{
+			die('Could not process your request');
+		}
+	}
+
+	function _update($id)
+	{
+    	$project = $this->projects_m->get_project($id);
+    	if(is_object($project))
+    	{
 			if(!$this->input->post('update_project_btn'))
 			{
 		        $data['contentView'] = 'projects/forms/update_project_form';
@@ -47,20 +108,24 @@ class Projects extends MY_Controller {
 		    }
 		    else
 		    {
-				$update_project = $this->projects_m->update_project($id);
-				if((bool) $update_project)
+				$update_project = $this->projects_m->update_project($project->project_id);
+				if($update_project)
 				{
-					redirect('projects/update/'.$id, 'refresh');
+					redirect('projects/manage/'.$id.'/update', 'refresh');
 				}
 				else
 				{
-					die('Could not update project details');
+					die('Could not update project.');
 				}
-		    }
-		}
+			}
+    	}
+    	else
+    	{
+			die('The project with the ID <b>'.$id.'</b> was not found.');
+    	}
 	}
 
-	public function delete($id=NULL)
+	function _delete($id=NULL)
 	{
 		if(is_null($id) || !is_numeric($id))
 		{
@@ -68,58 +133,23 @@ class Projects extends MY_Controller {
 		}
 		else
 		{
-			$delete_project = $this->projects_m->delete_project($id);
-			if($delete_project)
-			{
-				die('Project deleted');
-			}
-			else
-			{
-				die('Could not delete project!');
-			}
-		}
-	}
-
-	public function view($flag, $id=NULL)
-	{
-		switch($flag)
-		{
-			case 'all':
-				$projects = $this->projects_m->get_projects();
-				if($projects)
+	    	$project = $this->projects_m->get_project($id);
+	    	if(is_object($project))
+	    	{
+				$delete_project = $this->projects_m->delete_project($id);
+				if($delete_project)
 				{
-					echo '<pre>';
-					print_r($projects);
+					die('Project deleted');
 				}
 				else
 				{
-					die('Could not get projects or none are listed');
+					die('Could not delete project!');
 				}
-				break;
-
-			case 'project':
-				if(is_null($id) || !is_numeric($id))
-				{
-					die('Numeric value expected in ID.');
-				}
-				else
-				{
-					$project = $this->projects_m->get_project($id);
-					if($project)
-					{
-						echo '<pre>';
-						print_r($project);
-					}
-					else
-					{
-						die('Could not get project');
-					}
-				}
-				break;
-
-			default:
-				die('Could not process your request');
-				break;
+			}
+	    	else
+	    	{
+				die('The project with the ID <b>'.$id.'</b> was not found.');
+	    	}
 		}
 	}
 

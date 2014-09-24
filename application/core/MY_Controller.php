@@ -30,4 +30,9 @@ class MY_Controller extends MX_Controller{
 			die('You cannot view the <b>'.str_replace('_', ' ', $current_page).'</b> page while logged in.');
 		}
     }
+
+    public function get_groups($id)
+    {
+        # Get groups for the provides user. Used to limit access to modules and functions
+    }
 }

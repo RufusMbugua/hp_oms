@@ -98,7 +98,8 @@ class Groups extends MY_Controller {
 				die('No groups were found.');
 			}
 		}
-		else{
+		else
+		{
 			die('Could not process your request');
 		}
 	}

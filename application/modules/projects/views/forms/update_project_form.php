@@ -1,5 +1,5 @@
 <?php 
-echo form_open('projects/update/'.$this->uri->segment(3)); ?>
+echo form_open('projects/manage/'.$project->project_id.'/update'); ?>
 
   <div class="form-group">
     <label for="project_name">Project Name</label>
