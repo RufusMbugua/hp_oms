@@ -1,4 +1,4 @@
-<?php echo form_open('users/view/user/'.$user->user_id.'/assign_group'); ?>
+<?php echo form_open('users/manage/'.$user->user_id.'/add_to_group'); ?>
 
   <div class="form-group">
     <p class="help-block">Assign <b><?php echo $user->surname.' '.$user->other_names; ?></b> to a group.</p>

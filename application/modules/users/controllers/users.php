@@ -79,11 +79,11 @@ class Users extends MY_Controller {
 					break;
 				
 				case 'add_to_group':
-					$this->add_to_group($id);
+					$this->_add_to_group($id);
 					break;
 				
 				case 'remove_from_group':
-					$this->remove_from_group($id);
+					$this->_remove_from_group($id);
 					break;
 				
 				case 'add_to_project':
@@ -120,7 +120,7 @@ class Users extends MY_Controller {
 			if($login_user)
 			{
 				// Shows your profile // redirect('users/view/user/'.$this->user->user_id, 'refresh');
-				redirect('action_center', 'refresh');
+				redirect('users/view/me', 'refresh');
 			}
 			else
 			{
@@ -264,20 +264,36 @@ class Users extends MY_Controller {
 				die('User with the ID <b>'.$flag.'</b> was not found.');
 			}
 		}
-		elseif(is_string($flag) && $flag === 'all')
+		elseif(is_string($flag))
 		{
-			$users = $this->ion_auth->users()->result();
-			if(is_array($users))
-			{
-				echo '<legend>All Users</legend>';
-				echo '<pre>';
-				print_r($users);
-				echo '</pre>';
-				die();
-			}
-			else
-			{
-				die('Users not found.');
+			switch ($flag) {
+				case 'all':
+					$users = $this->ion_auth->users()->result();
+					if(is_array($users))
+					{
+						echo '<legend>All Users</legend>';
+						echo '<pre>';
+						print_r($users);
+						echo '</pre>';
+						die();
+					}
+					else
+					{
+						die('Users not found.');
+					}
+					break;
+				
+				case 'me':
+					echo '<legend>'.$this->user->surname.' '.$this->user->other_names.'</legend>';
+					echo '<pre>';
+					print_r($this->user);
+					echo '</pre>';
+					die();
+					break;
+				
+				default:
+					# code...
+					break;
 			}
 		}
 		else
