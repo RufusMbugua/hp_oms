@@ -17,7 +17,7 @@
     </select>
   </div>
   <div class="form-group">
-    <input type="submit" name="assign_group_btn" value="Assign Group" class="btn btn-primary">
+    <input type="submit" name="add_to_group_btn" value="Assign Group" class="btn btn-primary">
   </div>
 
 <?php echo form_close(); ?>

@@ -257,6 +257,12 @@ class Users extends MY_Controller {
 				echo '<pre>';
 				print_r($user);
 				echo '</pre>';
+
+				$user_groups = $this->ion_auth->get_users_groups($user->user_id)->result();
+				echo '<legend>Group In</legend>';
+				echo '<pre>';
+				print_r($user_groups);
+				echo '</pre>';
 				die();
 			}
 			else
@@ -288,6 +294,13 @@ class Users extends MY_Controller {
 					echo '<pre>';
 					print_r($this->user);
 					echo '</pre>';
+
+					$user_groups = $this->ion_auth->get_users_groups($this->user->user_id)->result();
+					echo '<legend>Group In</legend>';
+					echo '<pre>';
+					print_r($user_groups);
+					echo '</pre>';
+
 					die();
 					break;
 				
