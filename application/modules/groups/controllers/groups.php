@@ -39,52 +39,122 @@ class Groups extends MY_Controller {
 	    }
 	}
 
-	public function update($id)
+	public function manage($id, $action)
 	{
-		$group = $this->ion_auth->group($id)->result();
-
-		if(is_array($group))
+		if(!is_numeric($id))
 		{
-			$this->form_validation->set_rules('group_name', 'Group Name', 'trim|required|is_unique[groups.name]');
-			$this->form_validation->set_rules('group_description', 'Group Description', 'trim|required');
-			if(!$this->input->post('update_group_btn') || $this->form_validation->run() == FALSE)
-			{
-		        $data['contentView'] = 'groups/forms/update_group_form';
-		        $data['title'] = 'Update Group';
-		        $data['group_info'] = $group;
-		        $this->template($data);
-		    }
-		    else
-		    {
-				if(!is_numeric($id))
-				{
-					die('Numeric value expected in ID.');
-				}
-				else
-				{
-					$group_name = $this->input->post('group_name');
-					$group_description = $this->input->post('group_description');
-					
-					$update_group = $this->ion_auth->update_group($id, $group_name, $group_description);
-					if($update_group)
-					{
-						die('Group updated!');
-					}
-					else
-					{
-						$errors = $this->ion_auth->errors();
-						die($errors);
-					}
-				}
-			}
+			die('Numeric value expected in ID.');
 		}
 		else
 		{
-			die('Group not found');
+			switch ($action) {
+				case 'update':
+					$this->_update($id);
+					break;
+				
+				case 'delete':
+					$this->_delete($id);
+					break;
+				
+				default:
+					die('Could not process your request');
+					break;
+			}
+
 		}
 	}
 
-	public function delete($id=NULL)
+	public function view($flag)
+	{
+		if(is_numeric($flag))
+		{
+			$group = $this->ion_auth->group($flag)->row();
+			if(is_object($group))
+			{
+				echo '<legend>'.ucfirst($group->name).' Group</legend>';
+				echo '<pre>';
+				print_r($group); 
+				echo '</pre>';
+				die();
+			}
+			else
+			{
+				die('Group with the ID <b>'.$flag.'</b> was not found.');
+			}
+		}
+		elseif($flag === 'all')
+		{
+			$groups = $this->ion_auth->groups()->result();
+			if(is_array($groups))
+			{
+				echo '<legend>All Groups</legend>';
+				echo '<pre>';
+				print_r($groups); 
+				echo '</pre>';
+				die();
+			}
+			else
+			{
+				die('No groups were found.');
+			}
+		}
+		else{
+			die('Could not process your request');
+		}
+	}
+
+	function _update($id)
+	{
+		if(!is_numeric($id))
+		{
+			die('Numeric value expected in ID.');
+		}
+		else
+		{
+			$group = $this->ion_auth->group($id)->row();
+			if(is_object($group))
+			{
+				$this->form_validation->set_rules('group_name', 'Group Name', 'trim|required|is_unique[groups.name]');
+				$this->form_validation->set_rules('group_description', 'Group Description', 'trim|required');
+				if(!$this->input->post('update_group_btn') || $this->form_validation->run() == FALSE)
+				{
+			        $data['contentView'] = 'groups/forms/update_group_form';
+			        $data['title'] = 'Update Group';
+			        $data['group'] = $group;
+			        $this->template($data);
+			    }
+			    else
+			    {
+					if(!is_numeric($id))
+					{
+						die('Numeric value expected in ID.');
+					}
+					else
+					{
+						$group_name = $this->input->post('group_name');
+						$group_description = $this->input->post('group_description');
+						
+						$update_group = $this->ion_auth->update_group($id, $group_name, $group_description);
+						if($update_group)
+						{
+							redirect('groups/manage/'.$id.'/update', 'refresh');
+						}
+						else
+						{
+							$errors = $this->ion_auth->errors();
+							die($errors);
+						}
+					}
+				}
+			}
+			else
+			{
+				die('The group with the ID <b>'.$id.'</b> was not found.');
+			}
+		}
+	}
+
+	function _delete($id=NULL)
 	{
 		if(is_null($id) || !is_numeric($id))
 		{
@@ -111,49 +181,6 @@ class Groups extends MY_Controller {
 			{
 				die('Group not found');
 			}
-		}
-	}
-
-	public function view($flag, $id=NULL)
-	{
-		switch($flag)
-		{
-			case 'all':
-				$groups = $this->ion_auth->groups()->result();
-				if(count($groups) !== 0)
-				{
-					echo '<pre>';
-					print_r($groups); 
-				}
-				else
-				{
-					die('No groups found');
-				}
-				break;
-
-			case 'group':
-				if(is_null($id) || !is_numeric($id))
-				{
-					die('Numeric value expected in ID.');
-				}
-				else
-				{
-					$group = $this->ion_auth->group($id)->result();
-					if(count($group) !== 0)
-					{
-						echo '<pre>';
-						print_r($group); 
-					}
-					else
-					{
-						die('Group not found.');
-					}
-				}
-				break;
-
-			default:
-				die('Could not process request.');
-				break;
 		}
 	}
 
