@@ -297,7 +297,7 @@ class Users extends MY_Controller {
 					break;
 				
 				default:
-					# code...
+					die('Could not process request');
 					break;
 			}
 		}
