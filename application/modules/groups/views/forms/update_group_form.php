@@ -4,11 +4,19 @@ foreach($group_info as $group){
 
     <div class="form-group">
       <label for="group_name">Group Name</label>
-      <input type="text" class="form-control" name="group_name" value="<?php echo $group->name; ?>">
+      <?php
+        echo form_error('group_name');
+        $group_name = array('class'=>'form-control', 'name'=>'group_name', 'value'=>$group->name);
+        echo form_input($group_name);
+      ?>
     </div>
     <div class="form-group">
       <label for="group_description">Group Description</label>
-      <textarea name="group_description" class="form-control" rows="5"><?php echo $group->description; ?></textarea>
+      <?php
+        echo form_error('group_description');
+        $group_description = array('class'=>'form-control', 'name'=>'group_description', 'value'=>$group->description, 'rows'=>'5');
+        echo form_textarea($group_description);
+      ?>
     </div>
     <div class="form-group">
       <input type="submit" name="update_group_btn" value="Update Group" class="btn btn-primary">

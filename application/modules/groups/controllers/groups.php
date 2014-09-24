@@ -5,12 +5,17 @@ class Groups extends MY_Controller {
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->library('ion_auth');
+		if(!$this->ion_auth->logged_in())
+		{
+			redirect('users/login', 'refresh');
+		}
 	}
 
 	public function create()
 	{
-		if(!$this->input->post('create_group_btn'))
+		$this->form_validation->set_rules('group_name', 'Group Name', 'trim|required|is_unique[groups.name]');
+		$this->form_validation->set_rules('group_description', 'Group Description', 'trim|required');
+		if(!$this->input->post('create_group_btn') || $this->form_validation->run() == FALSE)
 		{
 	        $data['contentView'] = 'groups/forms/create_group_form';
 	        $data['title'] = 'Create Group';
@@ -36,35 +41,46 @@ class Groups extends MY_Controller {
 
 	public function update($id)
 	{
-		if(!$this->input->post('update_group_btn'))
+		$group = $this->ion_auth->group($id)->result();
+
+		if(is_array($group))
 		{
-	        $data['contentView'] = 'groups/forms/update_group_form';
-	        $data['title'] = 'Update Group';
-	        $data['group_info'] = $this->view('group', $id);
-	        $this->template($data);
-	    }
-	    else
-	    {
-			if(is_null($id) || !is_numeric($id))
+			$this->form_validation->set_rules('group_name', 'Group Name', 'trim|required|is_unique[groups.name]');
+			$this->form_validation->set_rules('group_description', 'Group Description', 'trim|required');
+			if(!$this->input->post('update_group_btn') || $this->form_validation->run() == FALSE)
 			{
-				die('Numeric value expected in ID.');
-			}
-			else
-			{
-				$group_name = $this->input->post('group_name');
-				$group_description = $this->input->post('group_description');
-				
-				$update_group = $this->ion_auth->update_group($id, $group_name, $group_description);
-				if($update_group)
+		        $data['contentView'] = 'groups/forms/update_group_form';
+		        $data['title'] = 'Update Group';
+		        $data['group_info'] = $group;
+		        $this->template($data);
+		    }
+		    else
+		    {
+				if(!is_numeric($id))
 				{
-					die('Group updated!');
+					die('Numeric value expected in ID.');
 				}
 				else
 				{
-					$errors = $this->ion_auth->errors();
-					die($errors);
+					$group_name = $this->input->post('group_name');
+					$group_description = $this->input->post('group_description');
+					
+					$update_group = $this->ion_auth->update_group($id, $group_name, $group_description);
+					if($update_group)
+					{
+						die('Group updated!');
+					}
+					else
+					{
+						$errors = $this->ion_auth->errors();
+						die($errors);
+					}
 				}
 			}
+		}
+		else
+		{
+			die('Group not found');
 		}
 	}
 

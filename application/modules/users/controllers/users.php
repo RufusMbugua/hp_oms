@@ -105,7 +105,7 @@ class Users extends MY_Controller {
 			}
 			else
 			{
-				die('Could not find user');
+				die('User with the ID <b>'.$id.'</b> was not found.');
 			}
 		}
 	}
@@ -118,16 +118,24 @@ class Users extends MY_Controller {
 		}
 		else
 		{
-			$delete_user = $this->ion_auth->delete_user($id);
-			if($delete_user)
+			$user = $this->ion_auth->user($id)->row();
+			if(is_object($user))
 			{
-				$messages = $this->ion_auth->messages();
-				die($messages);
+				$delete_user = $this->ion_auth->delete_user($user->id);
+				if($delete_user)
+				{
+					$messages = $this->ion_auth->messages();
+					die($messages);
+				}
+				else
+				{
+					$errors = $this->ion_auth->errors();
+					die($errors);
+				}
 			}
 			else
 			{
-				$errors = $this->ion_auth->errors();
-				die($errors);
+				die('User with the ID <b>'.$id.'</b> was not found.');
 			}
 		}
 	}
@@ -140,16 +148,24 @@ class Users extends MY_Controller {
 		}
 		else
 		{
-			$activate_user = $this->ion_auth->activate($id);
-			if($activate_user)
+			$user = $this->ion_auth->user($id)->row();
+			if(is_object($user))
 			{
-				$messages = $this->ion_auth->messages();
-				die($messages);
+				$activate_user = $this->ion_auth->activate($id);
+				if($activate_user)
+				{
+					$messages = $this->ion_auth->messages();
+					die($messages);
+				}
+				else
+				{
+					$errors = $this->ion_auth->errors();
+					die($errors);
+				}
 			}
 			else
 			{
-				$errors = $this->ion_auth->errors();
-				die($errors);
+				die('User with the ID <b>'.$id.'</b> was not found.');
 			}
 		}
 	}
@@ -162,16 +178,24 @@ class Users extends MY_Controller {
 		}
 		else
 		{
-			$deactivate_user = $this->ion_auth->deactivate($id);
-			if($deactivate_user)
+			$user = $this->ion_auth->user($id)->row();
+			if(is_object($user))
 			{
-				$messages = $this->ion_auth->messages();
-				die($messages);
+				$deactivate_user = $this->ion_auth->deactivate($id);
+				if($deactivate_user)
+				{
+					$messages = $this->ion_auth->messages();
+					die($messages);
+				}
+				else
+				{
+					$errors = $this->ion_auth->errors();
+					die($errors);
+				}
 			}
 			else
 			{
-				$errors = $this->ion_auth->errors();
-				die($errors);
+				die('User with the ID <b>'.$id.'</b> was not found.');
 			}
 		}
 	}
@@ -331,21 +355,23 @@ class Users extends MY_Controller {
 				echo '<pre>';
 				print_r($user);
 				echo '</pre>';
+				die();
 			}
 			else
 			{
-				die('User with the ID <b>'.$flag.'</b> not found.');
+				die('User with the ID <b>'.$flag.'</b> was not found.');
 			}
 		}
 		elseif(is_string($flag) && $flag === 'all')
 		{
-			$users = $this->ion_auth->users()->row();
-			if(is_object($users))
+			$users = $this->ion_auth->users()->result();
+			if(is_array($users))
 			{
 				echo '<legend>All Users</legend>';
 				echo '<pre>';
 				print_r($users);
 				echo '</pre>';
+				die();
 			}
 			else
 			{
