@@ -1,4 +1,4 @@
-<?php echo form_open('users/manage/'.$user->user_id.'/add_to_group'); ?>
+<?php echo form_open('users/manage/'.$user->user_id.'/assign_group'); ?>
 
   <div class="form-group">
     <p class="help-block">Assign <b><?php echo $user->surname.' '.$user->other_names; ?></b> to a group.</p>
@@ -17,7 +17,7 @@
     </select>
   </div>
   <div class="form-group">
-    <input type="submit" name="add_to_group_btn" value="Assign Group" class="btn btn-primary">
+    <input type="submit" name="assign_group_btn" value="Assign Group" class="btn btn-primary">
   </div>
 
 <?php echo form_close(); ?>

@@ -78,20 +78,12 @@ class Users extends MY_Controller {
 					$this->_deactivate($id);
 					break;
 				
-				case 'add_to_group':
-					$this->_add_to_group($id);
+				case 'assign_group':
+					$this->_assign_group($id);
 					break;
 				
-				case 'remove_from_group':
-					$this->_remove_from_group($id);
-					break;
-				
-				case 'add_to_project':
-					$this->_add_to_project($id);
-					break;
-				
-				case 'remove_from_project':
-					$this->_remove_from_project($id);
+				case 'assign_project':
+					$this->_assign_project($id);
 					break;
 				
 				default:
@@ -448,12 +440,12 @@ class Users extends MY_Controller {
 		}
 	}
 
-	function _add_to_group($id)
+	function _assign_group($id)
 	{
-		if(!$this->input->post('add_to_group_btn'))
+		if(!$this->input->post('assign_group_btn'))
 		{
-	        $data['contentView'] = 'users/forms/add_to_group_form';
-	        $data['title'] = 'Add to Group';
+	        $data['contentView'] = 'users/forms/assign_group_form';
+	        $data['title'] = 'Assign Group';
 	        $data['user'] = $this->ion_auth->user($id)->row();
 	        $data['groups_info'] = $this->ion_auth->groups()->result();
 	        $this->template($data);
@@ -465,7 +457,6 @@ class Users extends MY_Controller {
 
 			if(count($user_groups) !== 0)
 			{
-				# Remove user from groups
 				foreach($user_groups as $user_group)
 				{
 					$this->ion_auth->remove_from_group($user_group->id, $id);
@@ -475,7 +466,7 @@ class Users extends MY_Controller {
 			$assign_group = $this->ion_auth->add_to_group($group_id, $id);
 			if($assign_group)
 			{
-				die('User added to group!');
+	    		die('User assigned to group');
 			}
 			else
 			{
@@ -485,50 +476,13 @@ class Users extends MY_Controller {
 		}
 	}
 
-	function _remove_from_group($id)
-	{
-		if(!$this->input->post('remove_from_group_btn'))
-		{
-	        $data['contentView'] = 'users/forms/remove_from_group_form';
-	        $data['title'] = 'Remove from Group';
-	        $data['user'] = $this->ion_auth->user($id)->row();
-	        $data['groups_info'] = $this->ion_auth->groups()->result();
-	        $this->template($data);
-	    }
-	    else
-	    {
-	    	$group_id = $this->input->post('group_id');
-			$user_groups = $this->ion_auth->get_users_groups($id)->result();
-
-			if(count($user_groups) !== 0)
-			{
-				# Remove user from groups
-				foreach($user_groups as $user_group)
-				{
-					$this->ion_auth->remove_from_group($user_group->id, $id);
-				}
-			}
-
-			$assign_group = $this->ion_auth->add_to_group($group_id, $id);
-			if($assign_group)
-			{
-				die('User removed from group!');
-			}
-			else
-			{
-				$errors = $this->ion_auth->errors();
-				die($errors);
-			}
-		}
-	}
-
-	function _add_to_project($id)
+	function _assign_project($id)
 	{
 		$this->load->model('projects/projects_m');
-		if(!$this->input->post('add_to_project_btn'))
+		if(!$this->input->post('assign_project_btn'))
 		{
-	        $data['contentView'] = 'users/forms/add_to_project_form';
-	        $data['title'] = 'Add to Project';
+	        $data['contentView'] = 'users/forms/assign_project_form';
+	        $data['title'] = 'Assign Project';
 	        $data['user'] = $this->ion_auth->user($id)->row();
 	        $data['projects_info'] = $this->projects_m->get_projects();
 	        $this->template($data);
@@ -538,36 +492,11 @@ class Users extends MY_Controller {
 	    	$add_to_project = $this->users_m->add_to_project($id);
 	    	if($add_to_project)
 	    	{
-	    		die('User added to project');
+	    		die('User assigned to project');
 	    	}
 	    	else
 	    	{
-	    		die('Could not add user to project');
-	    	}
-		}
-	}
-
-	function _remove_from_project($id)
-	{
-		$this->load->model('projects/projects_m');
-		if(!$this->input->post('remove_from_project_btn'))
-		{
-	        $data['contentView'] = 'users/forms/remove_from_project_form';
-	        $data['title'] = 'Remove from Project';
-	        $data['user'] = $this->ion_auth->user($id)->row();
-	        $data['projects_info'] = $this->projects_m->get_projects();
-	        $this->template($data);
-	    }
-	    else
-	    {
-	    	$add_to_project = $this->users_m->add_to_project($id);
-	    	if($add_to_project)
-	    	{
-	    		die('User removed from project');
-	    	}
-	    	else
-	    	{
-	    		die('Could not remove user from project');
+	    		die('Could not assign user to project');
 	    	}
 		}
 	}
