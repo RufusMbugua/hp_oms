@@ -55,7 +55,7 @@ class Users extends MY_Controller {
 
 	public function update($id)
 	{
-		if(is_null($id) || !is_numeric($id))
+		if(!is_numeric($id))
 		{
 			die('Numeric value expected in ID.');
 		}
@@ -112,7 +112,7 @@ class Users extends MY_Controller {
 
 	public function delete($id=NULL)
 	{
-		if(is_null($id) || !is_numeric($id))
+		if(!is_numeric($id))
 		{
 			die('Numeric value expected in ID.');
 		}
@@ -140,63 +140,36 @@ class Users extends MY_Controller {
 		}
 	}
 
-	public function activate($id)
+	public function manage($id, $action)
 	{
-		if(is_null($id) || !is_numeric($id))
+		if(!is_numeric($id))
 		{
 			die('Numeric value expected in ID.');
 		}
 		else
 		{
-			$user = $this->ion_auth->user($id)->row();
-			if(is_object($user))
-			{
-				$activate_user = $this->ion_auth->activate($id);
-				if($activate_user)
-				{
-					$messages = $this->ion_auth->messages();
-					die($messages);
-				}
-				else
-				{
-					$errors = $this->ion_auth->errors();
-					die($errors);
-				}
+			switch ($action) {
+				case 'activate':
+					$this->_activate($id);
+					break;
+				
+				case 'deactivate':
+					$this->_deactivate($id);
+					break;
+				
+				case 'assign_project':
+					$this->_activate($id);
+					break;
+				
+				case 'assign_group':
+					$this->_assign_group($id);
+					break;
+				
+				default:
+					die('Could not process your request')
+					break;
 			}
-			else
-			{
-				die('User with the ID <b>'.$id.'</b> was not found.');
-			}
-		}
-	}
 
-	public function deactivate($id)
-	{
-		if(is_null($id) || !is_numeric($id))
-		{
-			die('Numeric value expected in ID.');
-		}
-		else
-		{
-			$user = $this->ion_auth->user($id)->row();
-			if(is_object($user))
-			{
-				$deactivate_user = $this->ion_auth->deactivate($id);
-				if($deactivate_user)
-				{
-					$messages = $this->ion_auth->messages();
-					die($messages);
-				}
-				else
-				{
-					$errors = $this->ion_auth->errors();
-					die($errors);
-				}
-			}
-			else
-			{
-				die('User with the ID <b>'.$id.'</b> was not found.');
-			}
 		}
 	}
 
@@ -384,102 +357,111 @@ class Users extends MY_Controller {
 		}
 	}
 
-	public function manage($id, $action)
+	function _activate($id)
 	{
-		if(is_null($id) || !is_numeric($id))
+		$user = $this->ion_auth->user($id)->row();
+		if(is_object($user))
 		{
-			die('Numeric value expected in ID.');
+			$activate_user = $this->ion_auth->activate($id);
+			if($activate_user)
+			{
+				$messages = $this->ion_auth->messages();
+				die($messages);
+			}
+			else
+			{
+				$errors = $this->ion_auth->errors();
+				die($errors);
+			}
 		}
 		else
 		{
-			switch($action)
+			die('User with the ID <b>'.$id.'</b> was not found.');
+		}
+	}
+
+	function _deactivate($id)
+	{
+		$user = $this->ion_auth->user($id)->row();
+		if(is_object($user))
+		{
+			$deactivate_user = $this->ion_auth->deactivate($id);
+			if($deactivate_user)
 			{
-				case 'assign_to_group':
-					$this->_assign_group($id);
-					break;
-				case 'assign_to_group':
-					$this->_assign_project($id);
-					break;
-				default:
-					die('Could not process your request');
-					break;
+				$messages = $this->ion_auth->messages();
+				die($messages);
 			}
+			else
+			{
+				$errors = $this->ion_auth->errors();
+				die($errors);
+			}
+		}
+		else
+		{
+			die('User with the ID <b>'.$id.'</b> was not found.');
 		}
 	}
 
 	function _assign_group($id)
 	{
-		if(is_null($id) || !is_numeric($id))
+		if(!$this->input->post('assign_group_btn'))
 		{
-			die('Numeric value expected in ID.');
-		}
-		else
-		{
-			if(!$this->input->post('assign_group_btn'))
+	        $data['contentView'] = 'users/forms/assign_group_form';
+	        $data['title'] = 'Assign Group';
+	        $data['user'] = $this->ion_auth->user($id)->row();
+	        $data['groups_info'] = $this->ion_auth->groups()->result();
+	        $this->template($data);
+	    }
+	    else
+	    {
+	    	$group_id = $this->input->post('group_id');
+			$user_groups = $this->ion_auth->get_users_groups($id)->result();
+
+			if(count($user_groups) !== 0)
 			{
-		        $data['contentView'] = 'users/forms/assign_group_form';
-		        $data['title'] = 'Assign Group';
-		        $data['user'] = $this->ion_auth->user($id)->row();
-		        $data['groups_info'] = $this->ion_auth->groups()->result();
-		        $this->template($data);
-		    }
-		    else
-		    {
-		    	$group_id = $this->input->post('group_id');
-				$user_groups = $this->ion_auth->get_users_groups($id)->result();
+				# Remove user from groups
+				foreach($user_groups as $user_group)
+				{
+					$this->ion_auth->remove_from_group($user_group->id, $id);
+				}
+			}
 
-				if(count($user_groups) !== 0)
-				{
-					# Remove user from groups
-					foreach($user_groups as $user_group)
-					{
-						$this->ion_auth->remove_from_group($user_group->id, $id);
-					}
-				}
-
-				$assign_group = $this->ion_auth->add_to_group($group_id, $id);
-				if($assign_group)
-				{
-					die('User assigned to group!');
-				}
-				else
-				{
-					$errors = $this->ion_auth->errors();
-					die($errors);
-				}
+			$assign_group = $this->ion_auth->add_to_group($group_id, $id);
+			if($assign_group)
+			{
+				die('User assigned to group!');
+			}
+			else
+			{
+				$errors = $this->ion_auth->errors();
+				die($errors);
 			}
 		}
 	}
 
 	function _assign_project($id)
 	{
-		if(is_null($id) || !is_numeric($id))
+		$this->load->model('projects/projects_m');
+		if(!$this->input->post('assign_project_btn'))
 		{
-			die('Numeric value expected in ID.');
-		}
-		else
-		{
-			$this->load->model('projects/projects_m');
-			if(!$this->input->post('assign_project_btn'))
-			{
-		        $data['contentView'] = 'users/forms/assign_project_form';
-		        $data['title'] = 'Assign Project';
-		        $data['user'] = $this->ion_auth->user($id)->row();
-		        $data['projects_info'] = $this->projects_m->get_projects();
-		        $this->template($data);
-		    }
-		    else
-		    {
-		    	$add_to_project = $this->users_m->add_to_project($id);
-		    	if($add_to_project)
-		    	{
-		    		die('User added to project');
-		    	}
-		    	else
-		    	{
-		    		die('Could not add user to project');
-		    	}
-			}
+	        $data['contentView'] = 'users/forms/assign_project_form';
+	        $data['title'] = 'Assign Project';
+	        $data['user'] = $this->ion_auth->user($id)->row();
+	        $data['projects_info'] = $this->projects_m->get_projects();
+	        $this->template($data);
+	    }
+	    else
+	    {
+	    	$add_to_project = $this->users_m->add_to_project($id);
+	    	if($add_to_project)
+	    	{
+	    		die('User added to project');
+	    	}
+	    	else
+	    	{
+	    		die('Could not add user to project');
+	    	}
 		}
 	}
 
