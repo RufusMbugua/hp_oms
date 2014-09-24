@@ -5,7 +5,7 @@ class Users extends MY_Controller {
 	public function __construct()
 	{
 		parent::__construct();
-		$restricted_pages = array('create', 'update', 'delete', 'activate', 'deactivate', 'change_password', 'view', 'logout');
+		$restricted_pages = array('create', 'update', 'delete', 'manage', 'change_password', 'view', 'logout');
 		$current_page = $this->uri->segment(2);
 
 		$this->check_for_login($current_page, $restricted_pages);
@@ -53,93 +53,6 @@ class Users extends MY_Controller {
 	    }
 	}
 
-	public function update($id)
-	{
-		if(!is_numeric($id))
-		{
-			die('Numeric value expected in ID.');
-		}
-		else
-		{
-			$user = $this->ion_auth->user($id)->row();
-			if(is_object($user))
-			{
-				$this->form_validation->set_rules('surname', 'Surname', 'trim|required');
-				$this->form_validation->set_rules('other_names', 'Other Names', 'trim|required');
-				$this->form_validation->set_rules('gender', 'Gender', 'required');
-				$this->form_validation->set_rules('birthday', 'Birthday', 'trim|required');
-				
-				$phone = $this->input->post('phone');
-				if($phone && ($phone !== $user->phone))
-				{
-					$this->form_validation->set_rules('phone', 'Phone', 'trim|required|is_numeric|exact_length[10]|is_unique[users.phone]');
-				}
-
-				if(!$this->input->post('update_user_btn') || $this->form_validation->run() == FALSE)
-				{
-			        $data['contentView'] = 'users/forms/update_user_form';
-			        $data['title'] = 'Update User';
-			        $data['user'] = $user;
-			        $this->template($data);
-			    }
-			    else
-			    {
-					$data = array(
-						'surname' => $this->input->post('surname'),
-						'other_names' => $this->input->post('other_names'),
-						'gender' => $this->input->post('gender'),
-						'birthday' => $this->input->post('birthday'),
-						'phone' => $this->input->post('phone'),
-					);
-					$update_user = $this->ion_auth->update($id, $data);
-					if($update_user)
-					{
-						redirect('users/update/'.$id);
-					}
-					else
-					{
-						$errors = $this->ion_auth->errors();
-						die($errors);
-					}
-			    }
-			}
-			else
-			{
-				die('User with the ID <b>'.$id.'</b> was not found.');
-			}
-		}
-	}
-
-	public function delete($id=NULL)
-	{
-		if(!is_numeric($id))
-		{
-			die('Numeric value expected in ID.');
-		}
-		else
-		{
-			$user = $this->ion_auth->user($id)->row();
-			if(is_object($user))
-			{
-				$delete_user = $this->ion_auth->delete_user($user->id);
-				if($delete_user)
-				{
-					$messages = $this->ion_auth->messages();
-					die($messages);
-				}
-				else
-				{
-					$errors = $this->ion_auth->errors();
-					die($errors);
-				}
-			}
-			else
-			{
-				die('User with the ID <b>'.$id.'</b> was not found.');
-			}
-		}
-	}
-
 	public function manage($id, $action)
 	{
 		if(!is_numeric($id))
@@ -149,6 +62,14 @@ class Users extends MY_Controller {
 		else
 		{
 			switch ($action) {
+				case 'update':
+					$this->_update($id);
+					break;
+				
+				case 'delete':
+					$this->_delete($id);
+					break;
+				
 				case 'activate':
 					$this->_activate($id);
 					break;
@@ -166,7 +87,7 @@ class Users extends MY_Controller {
 					break;
 				
 				default:
-					die('Could not process your request')
+					die('Could not process your request');
 					break;
 			}
 
@@ -354,6 +275,93 @@ class Users extends MY_Controller {
 		else
 		{
 			die('Could not process request');
+		}
+	}
+
+	function _update($id)
+	{
+		if(!is_numeric($id))
+		{
+			die('Numeric value expected in ID.');
+		}
+		else
+		{
+			$user = $this->ion_auth->user($id)->row();
+			if(is_object($user))
+			{
+				$this->form_validation->set_rules('surname', 'Surname', 'trim|required');
+				$this->form_validation->set_rules('other_names', 'Other Names', 'trim|required');
+				$this->form_validation->set_rules('gender', 'Gender', 'required');
+				$this->form_validation->set_rules('birthday', 'Birthday', 'trim|required');
+				
+				$phone = $this->input->post('phone');
+				if($phone && ($phone !== $user->phone))
+				{
+					$this->form_validation->set_rules('phone', 'Phone', 'trim|required|is_numeric|exact_length[10]|is_unique[users.phone]');
+				}
+
+				if(!$this->input->post('update_user_btn') || $this->form_validation->run() == FALSE)
+				{
+			        $data['contentView'] = 'users/forms/update_user_form';
+			        $data['title'] = 'Update User';
+			        $data['user'] = $user;
+			        $this->template($data);
+			    }
+			    else
+			    {
+					$data = array(
+						'surname' => $this->input->post('surname'),
+						'other_names' => $this->input->post('other_names'),
+						'gender' => $this->input->post('gender'),
+						'birthday' => $this->input->post('birthday'),
+						'phone' => $this->input->post('phone'),
+					);
+					$update_user = $this->ion_auth->update($id, $data);
+					if($update_user)
+					{
+						redirect('users/manage/'.$id.'/update');
+					}
+					else
+					{
+						$errors = $this->ion_auth->errors();
+						die($errors);
+					}
+			    }
+			}
+			else
+			{
+				die('User with the ID <b>'.$id.'</b> was not found.');
+			}
+		}
+	}
+
+	function _delete($id=NULL)
+	{
+		if(!is_numeric($id))
+		{
+			die('Numeric value expected in ID.');
+		}
+		else
+		{
+			$user = $this->ion_auth->user($id)->row();
+			if(is_object($user))
+			{
+				$delete_user = $this->ion_auth->delete_user($user->id);
+				if($delete_user)
+				{
+					$messages = $this->ion_auth->messages();
+					die($messages);
+				}
+				else
+				{
+					$errors = $this->ion_auth->errors();
+					die($errors);
+				}
+			}
+			else
+			{
+				die('User with the ID <b>'.$id.'</b> was not found.');
+			}
 		}
 	}
 

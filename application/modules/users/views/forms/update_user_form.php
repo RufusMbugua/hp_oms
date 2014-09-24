@@ -1,5 +1,5 @@
 <?php 
-echo form_open('users/update/'.$this->uri->segment(3)); ?>
+echo form_open('users/manage/'.$user->user_id.'/update'); ?>
 
   <div class="form-group">
     <label for="surname">Surname</label>
