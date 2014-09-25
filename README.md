@@ -1,6 +1,10 @@
-# CodeIgniter 2 + HMVC + Doctrine 2
+# OFFICE MANAGEMENT SYSTEM (OMS) + ISSUE TRACKER:
 
-Setup ready to use CodeIgniter framework with:
+-	[HP-Strathmore Researh Lab](http://www.hp-strathmore.org)
+-	[OMS](http://www.hp-strathmore.org/oms)
+
+## Built on
+CodeIgniter 2 + HMVC + Doctrine 2:
 
 -	[CodeIgniter 2.2](http://codeigniter.com)
 - [Modular Extensions - HMVC](http://bitbucket.org/wiredesignz/codeigniter-modular-extensions-hmvc/overview)

@@ -2,7 +2,7 @@
 
 use blog\models\Post;
 
-class Posts extends MX_Controller {
+class Posts extends MY_Controller {
   
 	public function index()
 	{
